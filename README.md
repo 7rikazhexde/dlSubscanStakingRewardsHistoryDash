@@ -42,6 +42,9 @@ The Reward&Slash data displayed in the following demo uses [address](https://pol
 % git clone https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash.git
 ```
 2. Setup of virtual environment
+
+Run the poetry command.
+
 ```
 % poetry install
 ```
@@ -49,6 +52,12 @@ The Reward&Slash data displayed in the following demo uses [address](https://pol
 * See [Switching between environments](https://python-poetry.org/docs/managing-environments/#switching-between-environments).  
 * Please run ```poetry env info``` to check your development environment.  
 * If your python version is not 3.10 or higher, please run ```poetry env use python3.10``` to recreate your development environment.  
+
+Or create a virtual environment with venv, pyenv, etc. and run the following command.
+
+```
+% pip install -r requirements.txt
+``` 
 
 ### 2. Subscan API Settings 
 * Set the section marked "(User-defined required)" in ```app/config.ini``` before starting the application.
