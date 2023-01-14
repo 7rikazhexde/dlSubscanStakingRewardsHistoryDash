@@ -1,0 +1,33 @@
+/* elements with id='data_table' */
+/* All <button> elements with class='export' */
+#data_table button.export {
+    display: none;
+}
+
+/* elements with id='submit-usage' */
+#submit_usage {
+    color: rgb(50, 50, 50);
+    width: 100px;
+    padding: 5px;
+    font-size:20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border: 1px solid #68779a;
+    border-radius: 5px;
+    background: #cbe8fa;
+    cursor: pointer;
+}
+
+/* elements with id='export_table' */
+#export_table {
+    color: rgb(50, 50, 50);
+    width: 220px;
+    padding: 5px;
+    font-size:20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border: 1px solid #68779a;
+    border-radius: 5px;
+    background: #cbe8fa;
+    cursor: pointer;
+}
