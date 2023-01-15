@@ -200,7 +200,7 @@ def check_confirm_dialog(submit_n_clicks):
 def update_active_cell_info(n_clicks):
     if n_clicks:
         # Open the GitHub README.md
-        webbrowser.open('https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash/blob/main/README.md')
+        webbrowser.open('https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash#readme')
         return no_update
     raise PreventUpdate
 
