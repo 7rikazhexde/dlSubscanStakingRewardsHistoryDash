@@ -1,6 +1,6 @@
 import webbrowser
 import pandas as pd
-from dash import Dash, html, Input, Output, dash_table,dcc,State
+from dash import Dash, html, Input, Output, dash_table, dcc, State
 from subscan import SubscanStakingRewardDataProcess
 from subscan import SubscanStakingRewardsDataProcessForCryptact
 from df_manage import DfManage
@@ -197,7 +197,7 @@ def check_confirm_dialog(submit_n_clicks):
     Output('about_project_info', 'children'), 
     Input('submit_usage', 'n_clicks')
 )
-def update_active_cell_info(n_clicks):
+def open_url(n_clicks):
     if n_clicks:
         # Open the GitHub README.md
         webbrowser.open('https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash#readme')
