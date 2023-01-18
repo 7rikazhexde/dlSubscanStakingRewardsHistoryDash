@@ -5,6 +5,7 @@ class DfManage:
         self.__data = []
         self.__df_data = pd.DataFrame(self.__data)
         self.__df_page_num = 0
+        self.__error_flag = False
 
     # Setter/Getter for the DataFrame object
     def get_df(self):
@@ -23,3 +24,12 @@ class DfManage:
         self.__df_page_num = df_page_num
 
     df_page_num = property(get_df_page_num, set_df_page_num)
+
+    # Setter/Getter for error flag data
+    def get_error_flag(self):
+        return self.__error_flag
+     
+    def set_error_flag(self,error_flag):
+        self.__error_flag = error_flag
+
+    error_flag = property(get_error_flag, set_error_flag)

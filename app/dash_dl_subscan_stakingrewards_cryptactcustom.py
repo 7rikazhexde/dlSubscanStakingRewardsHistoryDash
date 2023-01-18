@@ -65,11 +65,17 @@ token_sort_div = html.Div(
     html.Div(
         [
             html.Div('Token:',style={'font-weight': 'bold'}),
-            dcc.RadioItems(id='radio_token',options=token_data_list, value=token_data_list[0], inline=True),
-            html.Div('Sort:',style={'font-weight': 'bold','margin-left': '10px'}),
+            dcc.Dropdown(
+                id='drop_down_div',
+                options=[dict(label=x,value=x) for x in token_data_list],
+                value=token_data_list[0],
+                clearable=False,
+                style={'margin-left': '5px','width': '105px'}
+            ),
+            html.Div('Sort:',style={'font-weight': 'bold','margin-left': '15px'}),
             dcc.RadioItems(id='radio_sort',options=sort_list, value=sort_list[0], inline=True),
         ],
-        style={'display':'inline-flex','margin-bottom': '10px'}
+        style={'display':'inline-flex','align-items': 'center','height':'30px','margin-bottom': '10px'}
     ),
     html.Div(''),
     ]
@@ -79,16 +85,25 @@ token_sort_div = html.Div(
 address_input_div = html.Div(
     [
         html.Div('Acount Address:',style={'font-weight': 'bold'}),
-        dcc.Input(id='input_address',type='text',value=config_manage.get_subscan_api_info_address(token_data_list[0]),size='56',style={'margin-left': '5px'}),
+        dcc.Input(id='input_address',type='text',placeholder="",value=config_manage.get_subscan_api_info_address(token_data_list[0]),size='58',style={'margin-left': '5px','height':'25px'}),
         html.Div('Input:',style={'font-weight': 'bold','margin-left': '5px'}),
-        dcc.Input(id='input_num',type='number',value=50 ,min=1, max=5000, step=1,style={'margin-left': '5px'}),
-        html.Button('Submit', id='submit', n_clicks=0,style={'margin-left': '5px'}),
+        dcc.Input(id='input_num',type='number',value=50 ,min=1, max=5000, step=1,style={'margin-left': '5px','height':'25px'}),
+        html.Button('Submit', id='submit', n_clicks=0,style={'margin-left': '5px','height':'30px'}),
     ],
-    style={'display':'inline-flex','margin-bottom': '10px'}
+    style={'display':'inline-flex','align-items': 'center','margin-bottom': '10px'}
+)
+
+# Select Table(Div)
+select_table_div = html.Div(
+    [
+        html.Div('Select Table Data: ',style={'font-weight': 'bold'}),
+        html.Div(id='select_table_info',children='No Data Selection',style={'margin-left': '5px'})
+    ],
+    style={'display':'inline-flex'}
 )
 
 # Active cell info(Div)
-active_cell_info_div = html.Div(id='active_cell_info',style={'margin-bottom': '10px'})
+active_cell_info_div = html.Div([select_table_div],id='active_cell_info',style={'margin-bottom': '10px'})
 
 # Response data(Div)
 result_responsedata_info = html.Div(
@@ -209,22 +224,37 @@ def open_url(n_clicks):
 #  - When active_cell is pressed, the response data (DataFrame object) corresponding to the cell is displayed in 'component_property:children'.
 #  - When the page is switched, 'No Data Selection' is displayed. (because the cell is deselected)
 @app.callback(
-    Output('active_cell_info', 'children'), 
+    Output('select_table_info', 'children'), 
     Input('data_table', 'active_cell'),
-    Input('data_table', 'page_current')
+    Input('data_table', 'page_current'),
+    Input('confirm_error_dialog', 'submit_n_clicks'),
+    Input('confirm_error_dialog', 'cancel_n_clicks')
 )
-def update_active_cell_info(active_cell,page_current):
+def update_active_cell_info(active_cell,page_current,submit_n_clicks,cancel_n_clicks):
+    
+    # Get df to reference in active cell
     df = df_manage.df_data
 
+    # Set page information
     if page_current is None:
         page_num = 0
     else:
         page_num = page_current
+
     df_manage.df_page_num = page_num
 
+    # Update page data for display
     show_page_num = page_num + 1
-    
+
+    # Error handling
+    if df_manage.error_flag:
+        text = 'No Data Selection'
+        df_manage.error_flag = False
+        return text
+
+    # Ccell selection judgment
     if active_cell:
+        # With cell selection
         page_num = df_manage.df_page_num
         row = active_cell['row'] + page_num * ROW_PER_PAGE
         column = active_cell['column']
@@ -232,13 +262,9 @@ def update_active_cell_info(active_cell,page_current):
         cell_data = df.iloc[row][active_cell['column_id']]
         text = f'\'{cell_data}\' from table page: {show_page_num} row: {row} culumn: {column} column_id: {column_id}'
     else:
+        # Without cell selection
         text = 'No Data Selection'
-    return html.Div([
-        html.Div('Select Table Data: ',style={'font-weight': 'bold'}),
-        html.Div(children=text,style={'margin-left': '5px'})
-    ],
-    style={'display':'inline-flex'}
-    )
+    return text
 
 # Specify custom data attributes as component_property
 # https://community.plotly.com/t/moving-datatable-export-button-and-changing-text/39115/2
@@ -260,11 +286,11 @@ app.clientside_callback(
 #    the address corresponding to the token defined in config.ini is displayed in the "component_property:value" of the input tag.
 @app.callback(
     Output('input_address', 'value'),
-    Input('radio_token', 'value'),
+    Input('drop_down_div', 'value'),
 )
-def update_selecter(radio_token):
+def update_selecter(token):
     # Get Subscan API Info
-    address = config_manage.get_subscan_api_info_address(radio_token)
+    address = config_manage.get_subscan_api_info_address(token)
     return address
 
 # Callback function to dash_table.DataTable and confirm_error_dialog  triggered by Submit Botton / n_clicks
@@ -292,7 +318,7 @@ def update_selecter(radio_token):
     Input('submit','n_clicks'),
     State('input_address','value'),
     State('radio_history_type', 'value'),
-    State('radio_token', 'value'),
+    State('drop_down_div', 'value'),
     State('input_num', 'value'),
     State('radio_sort', 'value'),
     prevent_initial_call=True
@@ -317,7 +343,10 @@ def get_subscan_stkrwd(n_clicks,address,history_type,token,num,sort_type):
     # Check Error
     is_error, text = is_error_check(response_code,response_status_code,list_num)
     
+    # Recieve data processing
     if is_error == True or list_num == 0:
+        # Error handling
+        df_manage.error_flag = True
         # Response data reception failure
         confirm_dialog_flag = True
         message = text
@@ -327,6 +356,7 @@ def get_subscan_stkrwd(n_clicks,address,history_type,token,num,sort_type):
         # Response data received successfully
         # Set received data (DataFrame)
         df_manage.df_data = df
+
         # Round to the maximum number if the acquisition limit is exceeded
         if int(num) > int(len(df)):
             supplement = '(*Retrieved up to the upper limit of the history.)'
