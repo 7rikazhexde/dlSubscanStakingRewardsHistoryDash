@@ -76,7 +76,7 @@ Or create a virtual environment with venv, pyenv, etc. and run the following com
 ```
 % cd app
 % poetry shell
-% python dash_dl_subscan_stakingrewards.py
+% python dash_dl_subscan_stakingrewards_cryptactcustom.py
 ```
 2. Application Launch
 
