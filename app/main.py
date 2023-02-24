@@ -414,4 +414,7 @@ def is_error_check(response_code,response_status_code,list_num):
     return result, text
 
 if __name__ == '__main__':
+    # To allow access from other computers on the local network
+    # app.run(debug=True,host='0.0.0.0')
+    # To allow access only from your own computer
     app.run(debug=True)

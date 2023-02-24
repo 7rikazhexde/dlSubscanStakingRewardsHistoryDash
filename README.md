@@ -76,7 +76,7 @@ Or create a virtual environment with venv, pyenv, etc. and run the following com
 ```
 % cd app
 % poetry shell
-% python dash_dl_subscan_stakingrewards_cryptactcustom.py
+% python main.py
 ```
 2. Application Launch
 
@@ -85,7 +85,7 @@ Please access the URL displayed.
 ```
 Dash is running on http://127.0.0.1:8050/
 
- * Serving Flask app 'dash_dl_subscan_stakingrewards_cryptactcustom'
+ * Serving Flask app 'main'
  * Debug mode: on
 ```
 
