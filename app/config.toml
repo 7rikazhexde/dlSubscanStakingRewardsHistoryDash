@@ -1,0 +1,99 @@
+# Configuration information to obtain staking information using API
+
+# Definition rules
+# API information is defined in a common format for each token, so the key must end with a lower-case token name.
+
+# Subscan API Infomation
+[subscan_api_info]
+# Token to be acquired(Only three tokens are supported: DOT, KSM, and ASTR.)
+token_list = [ "DOT", "KSM", "ASTR",]
+
+# API Key(User-defined required)
+# The API key is used in the HTTP Request Header information (X-API-Key), but the value can be obtained even if not specified.
+# However, Response data depends on Rate Limiting (Reference: Global Conventions).
+# If a large value is specified for the number of requests, "429 Too Many Requests" may result, and the function may not work properly. 
+# Please obtain an API key when using this service.
+api_key = ""
+
+# URL for Subscan API Reference
+subscan_api_doc = "[ https://docs.api.subscan.io/#introduction ]"
+
+# DOT Token(Defined in V2 API specification)
+# API Host
+request_url_dot = "/api/v2/scan/account/reward_slash"
+# Endpoint URL
+api_host_dot = "https://polkadot.api.subscan.io"
+# column name
+reward_slash_data_header_dot = [ "Event Index", "Era", "Date", "Block", "Extrinsic Index", "Value", "Action", "Stash", "Reward Account", "Validator Stash",]
+# Response Description
+reward_slash_data_dot = [ "event_index", "era", "block_timestamp", "extrinsic_index", "amount", "module_id", "event_id", "stash", "account", "validator_stash",]
+# Acount Address
+# If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
+address_dot = ""
+# decimal point adjustment value(User-defined required)
+adjust_value_dot = 1e-10
+# number of significant digits(User-defined required)
+# ex) three-digit number: 1.234 -> 1.23
+display_digit_dot = 11
+
+# KSM Token(Defined in V2 API specification)
+# API Host
+request_url_ksm = "/api/v2/scan/account/reward_slash"
+# Endpoint URL
+api_host_ksm = "https://kusama.api.subscan.io"
+# column name
+reward_slash_data_header_ksm = [ "Event Index", "Era", "Date", "Block", "Extrinsic Index", "Value", "Action", "Stash", "Reward Account",]
+# Response Description
+reward_slash_data_ksm = [ "event_index", "era", "block_timestamp", "extrinsic_index", "amount", "module_id", "event_id", "stash", "account",]
+# Acount Address
+# If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
+address_ksm = ""
+# decimal point adjustment value(User-defined required)
+adjust_value_ksm = 1e-12
+# number of significant digits(User-defined required)
+# ex) three-digit number: 1.234 -> 1.23
+display_digit_ksm = 11
+
+# ASTR Token(Defined in Staking API specification)
+# API Host
+request_url_astr = "/api/scan/account/reward_slash"
+# Endpoint URL
+api_host_astr = "https://astar.api.subscan.io"
+# column name
+reward_slash_data_header_astr = [ "Event ID", "Date", "Block", "Extrinsic Hash", "Value", "Action",]
+# Response Description
+reward_slash_data_astr = [ "event_index", "block_timestamp", "block_num", "extrinsic_hash", "amount", "module_id", "event_id",]
+# Acount Address
+# If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
+address_astr = ""
+# decimal point adjustment value(User-defined required)
+adjust_value_astr = 1e-18
+# number of significant digits(User-defined required)
+# ex) three-digit number: 1.234 -> 1.23
+display_digit_astr = 15
+
+# Information used in component_property in Dash Core Components
+[ui_info]
+# History Type
+history_type_list = [ "Reward&Slash", "CryptactCustom",]
+# Sort Type
+sort_list = [ "Ascending", "Descending",]
+
+# Cryptact custom file information (staking rewards)
+# Please check the URL for details.
+# https://support.cryptact.com/hc/ja/articles/360002571312-%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E4%BD%9C%E6%88%90%E6%96%B9%E6%B3%95#menu210
+[cryptact_info]
+# column name
+cryptact_custom_header = [ "Timestamp", "Action", "Source", "Base", "Volume", "Price", "Counter", "Fee", "FeeCcy", "Comment",]
+# Custom File Formats(User-defined required)
+action = "STAKING"
+price = ""
+counter = "JPY"
+fee = 0
+feeccy = "JPY"
+source_dot = "CRYPTACT_CUSTOM_DOT"
+base_dot = "DOT"
+source_ksm = "CRYPTACT_CUSTOM_KSM"
+base_ksm = "KSM"
+source_astr = "CRYPTACT_CUSTOM_ASTR"
+base_astr = "ASTR"

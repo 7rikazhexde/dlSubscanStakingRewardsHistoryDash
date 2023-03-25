@@ -33,20 +33,24 @@ The Reward&Slash data displayed in the following demo uses [address](https://pol
 ### Notes  
 * The assumption is that the response data is different from the Value displayed on Subscan Exploler.
 * Not all accounts are applicable, but Value is displayed with the number of digits of the value adjusted.
-* In this code, the data is adjusted to Reward&Slash's transaction history (Download all data) by setting the section information in "config.ini", so please compare the data with it when checking.
+* In this code, the data is adjusted to Reward&Slash's transaction history (Download all data) by setting the section information in "config.toml", so please compare the data with it when checking.
 
 ## Usage
 ### 1. environment building
+#### Note
+If you use a development environment that supports static analysis tools, see [Optional] Development environment.
+
 1. Get project
 ```
-% git clone https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash.git
+git clone https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash.git
 ```
+
 2. Setup of virtual environment
 
 Run the poetry command.
 
-```
-% poetry install
+```zsh
+poetry install --no-dev
 ```
 * If the package DL fails after installation, there may be a problem with the development environment.  
 * See [Switching between environments](https://python-poetry.org/docs/managing-environments/#switching-between-environments).  
@@ -56,11 +60,33 @@ Run the poetry command.
 Or create a virtual environment with venv, pyenv, etc. and run the following command.
 
 ```
-% pip install -r requirements.txt
-``` 
+pip install -r requirements.txt
+```
+
+### [Optional] Development environment
+The following static analysis tools are supported in the development environment
+* [isort](https://pypi.org/project/isort/): automatic organization of import statements
+* [black](https://pypi.org/project/black/): code formatter for Python (PEP8 compliant)
+* [flake8](https://pypi.org/project/flake8/): grammar checking
+* [mypy](https://pypi.org/project/mypy/): type checking with type annotations
+* [pytest](https://pypi.org/project/pytest/): A framework for writing unit tests created for Python.
+
+1. To create a development environment, do the following
+```zsh
+poetry install
+```
+
+2. How to use the static analysis tool (commands)
+```zsh
+poetry run isort app tests
+poetry run black app tests
+poetry run flake8 app tests
+poetry run mypy app tests
+poetry run pytest -s -vv --cov=. --cov-branch --cov-report=html
+```
 
 ### 2. Subscan API Settings 
-* Set the section marked "(User-defined required)" in ```app/config.ini``` before starting the application.
+* Set the section marked "(User-defined required)" in ```app/config.toml``` before starting the application.
 * Be sure to set the API key, address, decimal point adjustment value, and number of significant digits.
 * Each setting value will be displayed in conjunction with the token information set on the page from which you first accessed the URL. (See below for "Application Operations").
 * Please note that if the values are changed, the system will not operate normally.
@@ -73,10 +99,8 @@ Or create a virtual environment with venv, pyenv, etc. and run the following com
 
 ### 3. Application Execution
 1. Execute the program in a virtual environment
-```
-% cd app
-% poetry shell
-% python main.py
+```zsh
+cd app && poetry run python main.py
 ```
 2. Application Launch
 
@@ -114,7 +138,7 @@ Dash is running on http://127.0.0.1:8050/
 * Please enter your account.
 * If it is not a legitimate account, a response error will result.
 * The address is linked to Token (radio button).
-* It is automatically entered by defining the ```address_{tokken name}``` key in the ```[subscan_api_info]``` selection in ```config.ini```. 
+* It is automatically entered by defining the ```address_{tokken name}``` key in the ```[subscan_api_info]``` selection in ```config.toml```. 
 
 #### 6. Input Number
 * Enter the number to retrieve.
@@ -147,9 +171,9 @@ Dash is running on http://127.0.0.1:8050/
 ## Other Information
 ### Cryptact Custom File
 Data is created according to the specifications in [カスタムファイルの作成方法 / 2.10.ステーキングによる報酬](https://support.cryptact.com/hc/ja/articles/360002571312-%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E4%BD%9C%E6%88%90%E6%96%B9%E6%B3%95-%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E5%8F%96%E5%BC%95-#menu210).
-* The data for the Cryptact custom file consists of a header and line data. The headers are stored in `[cryptact_info]` in "config.ini".
-`Cryptact_custom_header` value (list type) in "config.ini". 
+* The data for the Cryptact custom file consists of a header and line data. The headers are stored in `[cryptact_info]` in "config.toml".
+`Cryptact_custom_header` value (list type) in "config.toml". 
 * Row data is created from a list of variable values (`block_timestamp`,`amount`,`event_index`) and `fixed values` (`[cryptact_info]`).
 * `block_timestamp` is converted to local time with `fromtimestamp()` because it is UNIX time as it is.
 * Date and time information is converted to string by specifying the format to match the Cryptact specification.
-* Since `amount` does not match the actual reward amount as it is, adjust the decimal point adjustment value (`[subscan_api_info]` `display_digit_dot/ksw/astr`) set in `config.ini` using the number of significant digits (`[subscan_ api_info]`,`adjust_value_dot/ksw/astr`) using the number of significant digits (`[subscan_info]`).
+* Since `amount` does not match the actual reward amount as it is, adjust the decimal point adjustment value (`[subscan_api_info]` `display_digit_dot/ksw/astr`) set in `config.toml` using the number of significant digits (`[subscan_ api_info]`,`adjust_value_dot/ksw/astr`) using the number of significant digits (`[subscan_info]`).
