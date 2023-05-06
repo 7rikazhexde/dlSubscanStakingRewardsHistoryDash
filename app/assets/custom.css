@@ -18,6 +18,17 @@
     cursor: pointer;
 }
 
+/* elements with id='submit-usage' */
+#submit {
+    color: rgb(50, 50, 50);
+    height: 30px;
+    margin-left: 5px;
+    border: 1px solid #68779a;
+    border-radius: 2px;
+    background: #cbe8fa;
+    cursor: pointer;
+}
+
 /* elements with id='export_table' */
 #export_table {
     color: rgb(50, 50, 50);
@@ -25,9 +36,23 @@
     padding: 5px;
     font-size:20px;
     box-sizing: border-box;
-    margin-bottom: 10px;
     border: 1px solid #68779a;
     border-radius: 5px;
     background: #cbe8fa;
+    cursor: pointer;
+}
+
+/* show_graph */
+/* Defined but not used */
+#show_graph {
+    color: rgb(252, 252, 252);
+    width: 220px;
+    padding: 5px;
+    font-size:20px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border: 1px solid #9a9aff;
+    border-radius: 5px;
+    background: #798bf1;
     cursor: pointer;
 }

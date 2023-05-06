@@ -2,14 +2,18 @@ import webbrowser
 from typing import List
 
 import pandas as pd
+import plotly.graph_objects as go
 from config_manage import ConfigManage
 from dash import Dash, Input, Output, State, dash_table, dcc, html
 from dash.dash import no_update
 from dash.exceptions import PreventUpdate
 from dcc_manage import DccManage
 from df_manage import DfManage
-from subscan import (SubscanStakingRewardDataProcess,
-                     SubscanStakingRewardsDataProcessForCryptact)
+from pandas.api.types import is_datetime64_dtype
+from subscan import (
+    SubscanStakingRewardDataProcess,
+    SubscanStakingRewardsDataProcessForCryptact,
+)
 
 # Number of rows per page linking Data_table and DataFrame
 ROW_PER_PAGE = 20
@@ -121,7 +125,7 @@ address_input_div = html.Div(
             "Submit",
             id="submit",
             n_clicks=0,
-            style={"margin-left": "5px", "height": "30px"},
+            style={"margin-left": "5px", "height": "30px", "background": "#cbe8fa"},
         ),
     ],
     style={"display": "inline-flex", "align-items": "center", "margin-bottom": "10px"},
@@ -171,40 +175,79 @@ result_responsedata_info_div = html.Div(
 )
 
 # Table(dash_table.DataTable)
-dash_data_table = dash_table.DataTable(
-    id="data_table",
-    columns=[dict(name=str(i), id=str(i)) for i in df_base.columns],
-    data=df_base.to_dict("records"),
-    fixed_rows=dict(headers=True, data=0),
-    style_cell=dict(
-        textAlign="left",
-        minWidth="50px",
-        width="100px",
-        maxWidth="200px",
-        overflow="hidden",
-        textOverflow="ellipsis",
-    ),
-    style_header=dict(backgroundColor="paleturquoise", textAlign="center"),
-    style_data=dict(backgroundColor="lavender"),
-    sort_action="none",
-    export_format="csv",
-    page_size=10,
-    style_table=dict(height="280px", overflowY="auto"),
+dash_data_table = html.Div(
+    [
+        html.Div(
+            id="dash_table_title",
+            children="",
+            style={
+                "color": "rgb(50, 50, 50)",
+                "font-size": "115%",
+                "margin-bottom": "10px",
+            },
+        ),
+        dash_table.DataTable(
+            id="data_table",
+            columns=[dict(name=str(i), id=str(i)) for i in df_base.columns],
+            data=df_base.to_dict("records"),
+            fixed_rows=dict(headers=True, data=0),
+            style_cell=dict(
+                textAlign="left",
+                minWidth="50px",
+                width="100px",
+                maxWidth="200px",
+                overflow="hidden",
+                textOverflow="ellipsis",
+            ),
+            style_header=dict(backgroundColor="paleturquoise", textAlign="center"),
+            style_data=dict(backgroundColor="lavender"),
+            sort_action="none",
+            export_format="csv",
+            page_size=10,
+            style_table=dict(height="280px", overflowY="auto"),
+        ),
+    ]
 )
 
 # Export(Button)
 # Change the style of the export button
 # https://community.plotly.com/t/styling-the-export-button-in-datatable/38798/9
 export_button = html.Button(
-    "CSV Dwonload",
+    "Download CSV",
     id="export_table",
-    style={"backgroundColor": "paleturquoise", "margin-top": "10px"},
+    style={
+        "backgroundColor": "paleturquoise",
+        "margin-top": "5px",
+    },
     **{"data-text": ""},
+)
+
+show_graph_button = html.Button(
+    "Show Graph",
+    id="show_graph",
+    style={"margin-top": "2px", "display": "none"},
+    n_clicks=0,
+)
+
+# 2D-Graph(Div)
+graph_div = html.Div(
+    [
+        html.Div(id="2d_graph"),
+    ],
+    id="graph_div",
+    style={"display": "none"},
 )
 
 # Table & Export(Div & Button)
 table_div = html.Div(
-    [dash_data_table, export_button], id="table_div", style={"display": "none"}
+    [
+        dash_data_table,
+        export_button,
+        graph_div,
+        show_graph_button,
+    ],
+    id="table_div",
+    style={"display": "none"},
 )
 
 # Error Dialog(ConfirmDialog)
@@ -356,6 +399,7 @@ def update_selecter(token):
 @app.callback(
     Output("confirm_error_dialog", "displayed"),
     Output("confirm_error_dialog", "message"),
+    Output("dash_table_title", "children"),
     Output("data_table", "data"),
     Output("data_table", "columns"),
     Output("data_table", "page_size"),
@@ -364,6 +408,7 @@ def update_selecter(token):
     Output("data_table", "active_cell"),
     Output("response_data_info", "children"),
     Output("table_div", "style"),
+    Output("graph_div", "style"),
     Input("submit", "n_clicks"),
     State("input_address", "value"),
     State("radio_history_type", "value"),
@@ -434,7 +479,9 @@ def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
             no_update,
             no_update,
             no_update,
+            no_update,
             response_data_info,
+            {"display": "none"},
             {"display": "none"},
         )
     else:
@@ -454,12 +501,19 @@ def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
             [
                 html.Div(children=text1),
                 html.Div(children=text2),
-                html.Div(children=text3),
+                html.Div(
+                    children=text3, style={"font-weight": "bold", "color": "#1e1eff"}
+                ),
             ],
         )
 
         if n_clicks:
             # submit
+            if history_type == "Reward&Slash":
+                title = f"{history_type} / {token} dash_table(n={len(df)})"
+            elif history_type == "CryptactCustom":
+                title = f"{history_type} / {token} dash_table(n={len(df)})"
+            dash_table_title_text = title
             data = df.to_dict("records")
             columns = [
                 {"name": str(i), "id": str(i), "deletable": False, "renamable": False}
@@ -473,6 +527,7 @@ def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
             return (
                 confirm_dialog_flag,
                 no_update,
+                dash_table_title_text,
                 data,
                 columns,
                 page_size,
@@ -480,6 +535,7 @@ def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
                 selected_cells,
                 active_cell,
                 response_data_info,
+                {"display": "inline"},
                 {"display": "inline"},
             )
     raise PreventUpdate
@@ -497,7 +553,7 @@ def is_error_check(response_code, response_status_code, list_num):
             "Error Details: Invalid Account Address.\n"
             "Please Check Account Address.\n\n"
             "Click OK button to go to the Subscan API Documents page.\n"
-            "Open URL?({config_manage.subscan_api_doc})\n"
+            f"Open URL?({config_manage.subscan_api_doc})\n"
         )
         result = True
     # HTTP Status Codes Error
@@ -506,7 +562,7 @@ def is_error_check(response_code, response_status_code, list_num):
             f"HTTP Status Codes: {response_status_code}\n"
             "Please Check Subscan API Documents.\n\n"
             "Click OK button to go to the Subscan API Documents page.\n"
-            "Open URL?({config_manage.subscan_api_doc})\n"
+            f"Open URL?({config_manage.subscan_api_doc})\n"
         )
         result = True
     # Error when no data received
@@ -521,9 +577,114 @@ def is_error_check(response_code, response_status_code, list_num):
     return result, text
 
 
+# Callback function to display graph
+# Summary:
+#  - Callback function to 2d_graph(Div) children triggered by dash_table_title(Div) children.
+#  - Stop callback when children attribute is empty.
+#  - When the children attribute is updated, a two-dimensional graph of date/time and staking data is created and displayed from the DataFrame object obtained by the Subscan API.
+@app.callback(
+    Output("2d_graph", "children"),
+    # Input("show_graph", "n_clicks"),
+    Input("dash_table_title", "children"),
+    State("drop_down_div", "value"),
+    State("radio_history_type", "value"),
+    State("radio_sort", "value"),
+)
+def display_graph(children, token, history_type, sort_type):
+    if children == "":
+        raise PreventUpdate
+    else:
+        df = df_manage.df_data
+        if sort_type == "Ascending":
+            graph_sort_type = False
+        else:
+            graph_sort_type = True
+        if history_type == "Reward&Slash":
+            title = f"{history_type} / {token} / Cumulative Sum Value Date Graph(n={len(df)})"
+            xaxis_data = "Date"
+            yaxis_data = "Value"
+        elif history_type == "CryptactCustom":
+            title = f"{history_type} / {token} / Cumulative Sum Volume Timestamp Graph(n={len(df)})"
+            xaxis_data = "Timestamp"
+            yaxis_data = "Volume"
+        # Layout setting
+        ts_layout = go.Layout(
+            title=dict(
+                text=title,
+                font=dict(size=19, color="rgb(50, 50, 50)"),
+                x=0,
+            ),
+            # Display legend on graph
+            showlegend=True,
+            legend=dict(
+                xanchor="left",
+                yanchor="bottom",
+                x=0.005,
+                y=0.89,
+                orientation="h",
+            ),
+            height=600,
+            # Display Range Slider and Selector
+            xaxis={
+                "title": xaxis_data,
+                "rangeslider": {"visible": True},
+                "rangeselector": {
+                    "buttons": [
+                        {
+                            "label": "1m",
+                            "step": "month",
+                            "count": 1,
+                            "stepmode": "backward",
+                        },
+                        {
+                            "label": "7d",
+                            "step": "day",
+                            "count": 7,
+                            "stepmode": "backward",
+                        },
+                        {"step": "all"},
+                    ]
+                },
+            },
+            yaxis={
+                "title": yaxis_data,
+            },
+        )
+
+        if not is_datetime64_dtype(df[xaxis_data]):
+            df[xaxis_data] = pd.to_datetime(
+                df[xaxis_data].str.replace("'", ""), format="%Y/%m/%d %H:%M:%S"
+            )
+        num = len(df)
+        sort_Column = list(range(num))
+        df = df.assign(SortColumn=sort_Column)
+        df = df.sort_values("SortColumn", ascending=graph_sort_type)
+        df = df.drop("SortColumn", axis=1)
+        df[yaxis_data] = df[yaxis_data].astype(float)
+        df[yaxis_data] = df[yaxis_data].cumsum()
+        df = df.reset_index()
+        fig = go.Figure(
+            go.Scatter(
+                name=yaxis_data,
+                x=df[xaxis_data],
+                y=df[yaxis_data],
+                mode="markers+lines",
+                # Colorize from y=0 to data
+                fill="tozeroy",
+            ),
+            layout=ts_layout,
+        )
+        # Update Scale
+        fig.update_layout(
+            xaxis=dict(range=[df[xaxis_data].min(), df[xaxis_data].max()]),
+            yaxis=dict(range=[df[yaxis_data].min(), df[yaxis_data].max()]),
+        )
+        return dcc.Graph(figure=fig)
+
+
 if __name__ == "__main__":
     # To allow access from other computers on the local network
     # app.run(debug=True,host='0.0.0.0')
     # To allow access only from your own computer
-    # If you want to hide the Dash Dev Tools, set dev_tools_ui=False.
-    app.run(debug=True, dev_tools_ui=True)
+    # If you want to use the Dash Dev Tools, set dev_tools_ui=True.
+    app.run(debug=True, dev_tools_ui=False)

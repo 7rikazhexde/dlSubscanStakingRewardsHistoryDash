@@ -3,8 +3,9 @@ Web app version of [dlSubscanStakingRewardsHistory](https://github.com/7rikazhex
 
 ## Summary
 Save data in the following formats as csv files using Dash, Ploly, and Subscan API.
-* Reward&Slash transaction history (Download all data)  
+* Reward&Slash transaction history (Download all data) 
 * Cryptact custom files (Staking rewards) 
+* 2-dimensional graphical display of cumulative staking reward values and dates   
 
 ### Supported tokens and Subscan API information
 StakingRewards is obtained by specifying the following `Request URL` for each token according to the [API Endpoint](https://support.subscan.io/#api-endpoints) specification.
