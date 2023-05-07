@@ -90,9 +90,7 @@ class SubscanStakingRewardsDataFrame:
         # 9 validator_stash
         self.__event_index = one_line_headerdata_list[0]
         self.__era = one_line_headerdata_list[1]
-        self.__date = "'" + (
-            datetime.utcfromtimestamp(one_line_headerdata_list[2])
-        ).strftime("%Y/%m/%d %H:%M:%S")
+        self.__date = datetime.utcfromtimestamp(one_line_headerdata_list[2])
         # Block data is created from event_index
         self.__block = self.__event_index.split("-")[0]
         self.__extrinsic_index = one_line_headerdata_list[3]
@@ -147,9 +145,7 @@ class SubscanStakingRewardsDataFrame:
         # 6 event_id
         # Event ID data is created from event_index
         self.__event_id = one_line_headerdata_list[0]
-        self.__date = "'" + (
-            datetime.utcfromtimestamp(one_line_headerdata_list[1])
-        ).strftime("%Y/%m/%d %H:%M:%S")
+        self.__date = datetime.utcfromtimestamp(one_line_headerdata_list[1])
         # Block data is created from event_index
         self.__block = self.__event_id.split("-")[0]
         self.__extrinsic_index = one_line_headerdata_list[3]
@@ -221,9 +217,7 @@ class SubscanStakingRewardsDataFrameForCryptact(SubscanStakingRewardsDataFrame):
         # 9 validator_stash
         if self.token_data == "DOT" or self.token_data == "KSM":
             self.__event_index = one_line_headerdata_list[0]
-            self.__date = "'" + (
-                datetime.fromtimestamp(one_line_headerdata_list[2])
-            ).strftime("%Y/%m/%d %H:%M:%S")
+            self.__date = datetime.utcfromtimestamp(one_line_headerdata_list[2])
             self.__value = float(one_line_headerdata_list[4]) * adjust_value
             self.__value = digit.format(self.__value)
             self.__one_line_data_list = [
@@ -246,9 +240,7 @@ class SubscanStakingRewardsDataFrameForCryptact(SubscanStakingRewardsDataFrame):
         # 5 module_id
         elif self.token_data == "ASTR":
             self.__event_id = one_line_headerdata_list[0]
-            self.__date = "'" + (
-                datetime.fromtimestamp(one_line_headerdata_list[1])
-            ).strftime("%Y/%m/%d %H:%M:%S")
+            self.__date = datetime.utcfromtimestamp(one_line_headerdata_list[1])
             self.__value = float(one_line_headerdata_list[4]) * adjust_value
             self.__value = digit.format(self.__value)
             self.__one_line_data_list = [
@@ -447,9 +439,9 @@ class SubscanStakingRewardDataProcess:
                     # Extract the number of cases from the data acquired for page_range
                     df_retrieve = concat_df_duplicates.iloc[: self.input_num, :]
                     # Sort
-                    self.sort_df_retrieve = self.sort_dataframe(
-                        df_retrieve, self.sort_type
-                    )
+                    self.sort_df_retrieve = df_retrieve.sort_values(by='Date', ascending=self.sort_type)
+                    self.sort_df_retrieve['Date'] = pd.to_datetime(self.sort_df_retrieve['Date'])
+                    self.sort_df_retrieve['Date'] = self.sort_df_retrieve['Date'].dt.strftime("%Y-%m-%d %H:%M:%S")
                     # List extracted data
                     self.response_data = self.sort_df_retrieve.values.tolist()
                     # Override by the total value of the list element
@@ -504,7 +496,9 @@ class SubscanStakingRewardDataProcess:
                         self.df_header, item, one_line_data_list
                     )
                 # Sort
-                self.sort_df_retrieve = self.sort_dataframe(df_page, self.sort_type)
+                self.sort_df_retrieve = df_page.sort_values(by='Date', ascending=self.sort_type)
+                self.sort_df_retrieve['Date'] = pd.to_datetime(self.sort_df_retrieve['Date'])
+                self.sort_df_retrieve['Date'] = self.sort_df_retrieve['Date'].dt.strftime("%Y-%m-%d %H:%M:%S")
                 # List extracted data
                 self.response_data = self.sort_df_retrieve.values.tolist()
         return (
@@ -518,6 +512,7 @@ class SubscanStakingRewardDataProcess:
         )
 
     # ascending-descending processing method
+    """
     def sort_dataframe(self, df, sort_type):
         num = len(df)
         sort_Column = list(range(num))
@@ -525,7 +520,7 @@ class SubscanStakingRewardDataProcess:
         df_s2 = df_s1.sort_values("SortColumn", ascending=sort_type)
         df_s3 = df_s2.drop("SortColumn", axis=1)
         return df_s3
-
+    """
 
 class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProcess):
     def __init__(
@@ -675,9 +670,9 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                     # Extract the number of cases from the data acquired for page_range
                     df_retrieve = concat_df_duplicates.iloc[: self.input_num, :]
                     # Sort
-                    self.sort_df_retrieve = self.sort_dataframe(
-                        df_retrieve, self.sort_type
-                    )
+                    self.sort_df_retrieve = df_retrieve.sort_values(by='Timestamp', ascending=self.sort_type)
+                    self.sort_df_retrieve['Timestamp'] = pd.to_datetime(self.sort_df_retrieve['Timestamp'])
+                    self.sort_df_retrieve['Timestamp'] = self.sort_df_retrieve['Timestamp'].dt.strftime("'%Y/%m/%d %H:%M:%S")
                     # List extracted data
                     self.response_data = self.sort_df_retrieve.values.tolist()
                     # Override by the total value of the list element
@@ -726,7 +721,9 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                         self.df_header, item, one_line_data_list
                     )
                 # Sort
-                self.sort_df_retrieve = self.sort_dataframe(df_page, self.sort_type)
+                self.sort_df_retrieve = df_page.sort_values(by='Timestamp', ascending=self.sort_type)
+                self.sort_df_retrieve['Timestamp'] = pd.to_datetime(self.sort_df_retrieve['Timestamp'])
+                self.sort_df_retrieve['Timestamp'] = self.sort_df_retrieve['Timestamp'].dt.strftime("'%Y/%m/%d %H:%M:%S")
                 # List extracted data
                 self.response_data = self.sort_df_retrieve.values.tolist()
         return (
