@@ -439,9 +439,15 @@ class SubscanStakingRewardDataProcess:
                     # Extract the number of cases from the data acquired for page_range
                     df_retrieve = concat_df_duplicates.iloc[: self.input_num, :]
                     # Sort
-                    self.sort_df_retrieve = df_retrieve.sort_values(by='Date', ascending=self.sort_type)
-                    self.sort_df_retrieve['Date'] = pd.to_datetime(self.sort_df_retrieve['Date'])
-                    self.sort_df_retrieve['Date'] = self.sort_df_retrieve['Date'].dt.strftime("%Y-%m-%d %H:%M:%S")
+                    self.sort_df_retrieve = df_retrieve.sort_values(
+                        by="Date", ascending=self.sort_type
+                    )
+                    self.sort_df_retrieve["Date"] = pd.to_datetime(
+                        self.sort_df_retrieve["Date"]
+                    )
+                    self.sort_df_retrieve["Date"] = self.sort_df_retrieve[
+                        "Date"
+                    ].dt.strftime("%Y-%m-%d %H:%M:%S")
                     # List extracted data
                     self.response_data = self.sort_df_retrieve.values.tolist()
                     # Override by the total value of the list element
@@ -496,9 +502,15 @@ class SubscanStakingRewardDataProcess:
                         self.df_header, item, one_line_data_list
                     )
                 # Sort
-                self.sort_df_retrieve = df_page.sort_values(by='Date', ascending=self.sort_type)
-                self.sort_df_retrieve['Date'] = pd.to_datetime(self.sort_df_retrieve['Date'])
-                self.sort_df_retrieve['Date'] = self.sort_df_retrieve['Date'].dt.strftime("%Y-%m-%d %H:%M:%S")
+                self.sort_df_retrieve = df_page.sort_values(
+                    by="Date", ascending=self.sort_type
+                )
+                self.sort_df_retrieve["Date"] = pd.to_datetime(
+                    self.sort_df_retrieve["Date"]
+                )
+                self.sort_df_retrieve["Date"] = self.sort_df_retrieve[
+                    "Date"
+                ].dt.strftime("%Y-%m-%d %H:%M:%S")
                 # List extracted data
                 self.response_data = self.sort_df_retrieve.values.tolist()
         return (
@@ -521,6 +533,7 @@ class SubscanStakingRewardDataProcess:
         df_s3 = df_s2.drop("SortColumn", axis=1)
         return df_s3
     """
+
 
 class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProcess):
     def __init__(
@@ -670,9 +683,15 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                     # Extract the number of cases from the data acquired for page_range
                     df_retrieve = concat_df_duplicates.iloc[: self.input_num, :]
                     # Sort
-                    self.sort_df_retrieve = df_retrieve.sort_values(by='Timestamp', ascending=self.sort_type)
-                    self.sort_df_retrieve['Timestamp'] = pd.to_datetime(self.sort_df_retrieve['Timestamp'])
-                    self.sort_df_retrieve['Timestamp'] = self.sort_df_retrieve['Timestamp'].dt.strftime("'%Y/%m/%d %H:%M:%S")
+                    self.sort_df_retrieve = df_retrieve.sort_values(
+                        by="Timestamp", ascending=self.sort_type
+                    )
+                    self.sort_df_retrieve["Timestamp"] = pd.to_datetime(
+                        self.sort_df_retrieve["Timestamp"]
+                    )
+                    self.sort_df_retrieve["Timestamp"] = self.sort_df_retrieve[
+                        "Timestamp"
+                    ].dt.strftime("'%Y/%m/%d %H:%M:%S")
                     # List extracted data
                     self.response_data = self.sort_df_retrieve.values.tolist()
                     # Override by the total value of the list element
@@ -721,9 +740,15 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                         self.df_header, item, one_line_data_list
                     )
                 # Sort
-                self.sort_df_retrieve = df_page.sort_values(by='Timestamp', ascending=self.sort_type)
-                self.sort_df_retrieve['Timestamp'] = pd.to_datetime(self.sort_df_retrieve['Timestamp'])
-                self.sort_df_retrieve['Timestamp'] = self.sort_df_retrieve['Timestamp'].dt.strftime("'%Y/%m/%d %H:%M:%S")
+                self.sort_df_retrieve = df_page.sort_values(
+                    by="Timestamp", ascending=self.sort_type
+                )
+                self.sort_df_retrieve["Timestamp"] = pd.to_datetime(
+                    self.sort_df_retrieve["Timestamp"]
+                )
+                self.sort_df_retrieve["Timestamp"] = self.sort_df_retrieve[
+                    "Timestamp"
+                ].dt.strftime("'%Y/%m/%d %H:%M:%S")
                 # List extracted data
                 self.response_data = self.sort_df_retrieve.values.tolist()
         return (
