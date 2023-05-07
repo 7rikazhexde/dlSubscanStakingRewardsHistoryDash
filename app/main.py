@@ -596,9 +596,9 @@ def display_graph(children, token, history_type, sort_type):
     else:
         df = df_manage.df_data
         if sort_type == "Ascending":
-            graph_sort_type = False
-        else:
             graph_sort_type = True
+        else:
+            graph_sort_type = False
         if history_type == "Reward&Slash":
             title = f"{history_type} / {token} / Cumulative Sum Value Date Graph(n={len(df)})"
             xaxis_data = "Date"
