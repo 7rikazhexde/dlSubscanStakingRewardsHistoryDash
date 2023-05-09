@@ -232,7 +232,7 @@ show_graph_button = html.Button(
 # 2D-Graph(Div)
 graph_div = html.Div(
     [
-        html.Div(id="2d_graph"),
+        dcc.Graph(id="date_cumsum_graph"),
     ],
     id="graph_div",
     style={"display": "none"},
@@ -579,11 +579,11 @@ def is_error_check(response_code, response_status_code, list_num):
 
 # Callback function to display graph
 # Summary:
-#  - Callback function to 2d_graph(Div) children triggered by dash_table_title(Div) children.
+#  - Callback function to date_cumsum_graph(Graph) children triggered by dash_table_title(Div) children.
 #  - Stop callback when children attribute is empty.
 #  - When the children attribute is updated, a two-dimensional graph of date/time and staking data is created and displayed from the DataFrame object obtained by the Subscan API.
 @app.callback(
-    Output("2d_graph", "children"),
+    Output("date_cumsum_graph", "figure"),
     # Input("show_graph", "n_clicks"),
     Input("dash_table_title", "children"),
     State("drop_down_div", "value"),
@@ -594,11 +594,16 @@ def display_graph(children, token, history_type, sort_type):
     if children == "":
         raise PreventUpdate
     else:
+        # Obtain data for graph display
         df = df_manage.df_data
+
+        # Create graph sorting information
         if sort_type == "Ascending":
             graph_sort_type = True
         else:
             graph_sort_type = False
+
+        # Create layout information for each historical information
         if history_type == "Reward&Slash":
             title = f"{history_type} / {token} / Cumulative Sum Value Date Graph(n={len(df)})"
             xaxis_data = "Date"
@@ -607,7 +612,8 @@ def display_graph(children, token, history_type, sort_type):
             title = f"{history_type} / {token} / Cumulative Sum Volume Timestamp Graph(n={len(df)})"
             xaxis_data = "Timestamp"
             yaxis_data = "Volume"
-        # Layout setting
+
+        # Create Layout
         ts_layout = go.Layout(
             title=dict(
                 text=title,
@@ -631,15 +637,15 @@ def display_graph(children, token, history_type, sort_type):
                 "rangeselector": {
                     "buttons": [
                         {
-                            "label": "1m",
-                            "step": "month",
-                            "count": 1,
-                            "stepmode": "backward",
-                        },
-                        {
                             "label": "7d",
                             "step": "day",
                             "count": 7,
+                            "stepmode": "backward",
+                        },
+                        {
+                            "label": "1m",
+                            "step": "month",
+                            "count": 1,
                             "stepmode": "backward",
                         },
                         {"step": "all"},
@@ -651,35 +657,48 @@ def display_graph(children, token, history_type, sort_type):
             },
         )
 
+        # Create object of type datetime
         if not is_datetime64_dtype(df[xaxis_data]):
             df[xaxis_data] = pd.to_datetime(
                 df[xaxis_data].str.replace("'", ""), format="%Y/%m/%d %H:%M:%S"
             )
+
+        # Sort Data
         num = len(df)
         sort_Column = list(range(num))
         df = df.assign(SortColumn=sort_Column)
         df = df.sort_values("SortColumn", ascending=graph_sort_type)
         df = df.drop("SortColumn", axis=1)
         df[yaxis_data] = df[yaxis_data].astype(float)
-        df[yaxis_data] = df[yaxis_data].cumsum()
+        df["cum_sum_data"] = df[yaxis_data].cumsum()
         df = df.reset_index()
+
+        # Create Trace
+        trace = go.Scatter(
+            name=yaxis_data,
+            x=df[xaxis_data],
+            y=df["cum_sum_data"],
+            mode="markers+lines",
+            hovertemplate=f"{xaxis_data}:"
+            + "%{x|%Y-%m-%d}<br>Cumsum:%{y:.1f}<br>%{customdata}<extra></extra>",
+            customdata=[f"{yaxis_data}:{yd:.1f}" for yd in df[yaxis_data]],
+            # Colorize from y=0 to data
+            fill="tozeroy",
+        )
+
+        # Create graph with specified trace and layout
         fig = go.Figure(
-            go.Scatter(
-                name=yaxis_data,
-                x=df[xaxis_data],
-                y=df[yaxis_data],
-                mode="markers+lines",
-                # Colorize from y=0 to data
-                fill="tozeroy",
-            ),
+            data=trace,
             layout=ts_layout,
         )
+
         # Update Scale
         fig.update_layout(
             xaxis=dict(range=[df[xaxis_data].min(), df[xaxis_data].max()]),
-            yaxis=dict(range=[df[yaxis_data].min(), df[yaxis_data].max()]),
+            yaxis=dict(range=[df["cum_sum_data"].min(), df["cum_sum_data"].max()]),
         )
-        return dcc.Graph(figure=fig)
+
+        return fig
 
 
 if __name__ == "__main__":
