@@ -217,7 +217,7 @@ class SubscanStakingRewardsDataFrameForCryptact(SubscanStakingRewardsDataFrame):
         # 9 validator_stash
         if self.token_data == "DOT" or self.token_data == "KSM":
             self.__event_index = one_line_headerdata_list[0]
-            self.__date = datetime.utcfromtimestamp(one_line_headerdata_list[2])
+            self.__date = datetime.fromtimestamp(one_line_headerdata_list[2])
             self.__value = float(one_line_headerdata_list[4]) * adjust_value
             self.__value = digit.format(self.__value)
             self.__one_line_data_list = [
@@ -240,7 +240,7 @@ class SubscanStakingRewardsDataFrameForCryptact(SubscanStakingRewardsDataFrame):
         # 5 module_id
         elif self.token_data == "ASTR":
             self.__event_id = one_line_headerdata_list[0]
-            self.__date = datetime.utcfromtimestamp(one_line_headerdata_list[1])
+            self.__date = datetime.fromtimestamp(one_line_headerdata_list[1])
             self.__value = float(one_line_headerdata_list[4]) * adjust_value
             self.__value = digit.format(self.__value)
             self.__one_line_data_list = [
