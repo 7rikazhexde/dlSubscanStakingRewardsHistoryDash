@@ -440,7 +440,7 @@ class SubscanStakingRewardDataProcess:
                     df_retrieve = concat_df_duplicates.iloc[: self.input_num, :]
                     # Sort
                     self.sort_df_retrieve = df_retrieve.sort_values(
-                        by="Date", ascending=self.sort_type
+                        by=["Date", "Event ID"], ascending=self.sort_type
                     )
                     self.sort_df_retrieve["Date"] = pd.to_datetime(
                         self.sort_df_retrieve["Date"]
@@ -503,7 +503,7 @@ class SubscanStakingRewardDataProcess:
                     )
                 # Sort
                 self.sort_df_retrieve = df_page.sort_values(
-                    by="Date", ascending=self.sort_type
+                    by=["Date", "Event ID"], ascending=self.sort_type
                 )
                 self.sort_df_retrieve["Date"] = pd.to_datetime(
                     self.sort_df_retrieve["Date"]
@@ -684,7 +684,7 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                     df_retrieve = concat_df_duplicates.iloc[: self.input_num, :]
                     # Sort
                     self.sort_df_retrieve = df_retrieve.sort_values(
-                        by="Timestamp", ascending=self.sort_type
+                        by=["Timestamp", "Comment"], ascending=self.sort_type
                     )
                     self.sort_df_retrieve["Timestamp"] = pd.to_datetime(
                         self.sort_df_retrieve["Timestamp"]
@@ -741,7 +741,7 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                     )
                 # Sort
                 self.sort_df_retrieve = df_page.sort_values(
-                    by="Timestamp", ascending=self.sort_type
+                    by=["Timestamp", "Comment"], ascending=self.sort_type
                 )
                 self.sort_df_retrieve["Timestamp"] = pd.to_datetime(
                     self.sort_df_retrieve["Timestamp"]

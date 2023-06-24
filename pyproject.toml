@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dlsubscanstakingrewardshistorydash"
-version = "0.2.0"
+version = "0.2.1"
 description = "This is the Dash App version of dlSubscanStakingRewardsHistory."
 authors = ["7rikaz_h785 <7rikaz.h785.stat2ltas41lcijad@gmail.com>"]
 license = "MIT"
@@ -23,16 +23,27 @@ flake8-pyproject = "^1.2.3"
 types-requests = "^2.28.11.16"
 types-toml = "^0.10.8.5"
 pytest-cov = "^4.0.0"
+pre-commit = "^3.3.3"
+taskipy = "^1.11.0"
+mdformat = "^0.7.16"
+
+[tool.taskipy.tasks]
+isort = "poetry run isort app tests"
+black = "poetry run black app tests"
+flake8 = "poetry run flake8 app tests"
+mypy = "poetry run mypy"
 
 [tool.black]
 target-version = ['py310']
 
 [tool.isort]
+profile = "black"
 
 [tool.flake8]
 ignore = ["E501","W503"]
 
 [tool.mypy]
+files = ["arc","tests"]
 python_version = "3.10"
 no_strict_optional = true
 ignore_missing_imports = true
