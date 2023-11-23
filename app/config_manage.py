@@ -3,7 +3,7 @@ from tomlkit.toml_file import TOMLFile
 
 class ConfigManage:
     def __init__(self):
-        self.__toml_config = TOMLFile("./config.toml")
+        self.__toml_config = TOMLFile("./app/config.toml")
         self.__config = self.__toml_config.read()
         self.__config_subscan_api_info = self.__config.get("subscan_api_info")
         self.__config_subscan_api_doc = self.__config_subscan_api_info[
