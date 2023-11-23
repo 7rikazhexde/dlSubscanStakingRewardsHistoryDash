@@ -6,8 +6,8 @@ create_post_commit() {
     cat > "$1" << EOF
 #!/usr/bin/env bash
 
-source "$SCRIPT_DIR/.venv/bin/activate"
-poetry run python "$SCRIPT_DIR/ci/run_git_tag_base_pyproject.py"
+source "$SCRIPT_DIR/../.venv/bin/activate"
+poetry run python "$SCRIPT_DIR/../ci/run_git_tag_base_pyproject.py"
 if [ \$? -ne 0 ]; then
     printf "Error occurred in run_git_tag_base_pyproject.py. Exiting post-commit.\n"
     exit 1
@@ -27,15 +27,15 @@ EOF
 }
 
 if [ -f "$SCRIPT_DIR/.git/hooks/post-commit" ]; then
-    read -p "$SCRIPT_DIR/.git/hooks/post-commit already exists. Do you want to create $SCRIPT_DIR/.git/hooks/post-commit.second instead? (y/N): " choice
+    read -p "$SCRIPT_DIR/../.git/hooks/post-commit already exists. Do you want to create $SCRIPT_DIR/.git/hooks/post-commit.second instead? (y/N): " choice
     if [[ $choice == "y" || $choice == "Y" ]]; then
-        create_post_commit "$SCRIPT_DIR/.git/hooks/post-commit.second"
+        create_post_commit "$SCRIPT_DIR/../.git/hooks/post-commit.second"
         exit 0
     else
-        create_post_commit "$SCRIPT_DIR/.git/hooks/post-commit" "execute"
+        create_post_commit "$SCRIPT_DIR/../.git/hooks/post-commit" "execute"
         exit 0
     fi
 fi
 
-create_post_commit "$SCRIPT_DIR/.git/hooks/post-commit" "execute"
+create_post_commit "$SCRIPT_DIR/../.git/hooks/post-commit" "execute"
 exit 0

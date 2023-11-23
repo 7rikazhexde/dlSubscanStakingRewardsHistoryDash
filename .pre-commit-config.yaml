@@ -40,26 +40,33 @@ repos:
   # Repository local hooks
   - repo: local
     hooks:
-    -   id: isort
-        name: isort
-        stages: [commit]
-        language: system
-        entry: poetry run isort app tests
-        types: [python]
+    #-   id: isort
+    #    name: isort
+    #    stages: [commit]
+    #    language: system
+    #    entry: poetry run isort app tests
+    #    types: [python]
 
     -   id: black
         name: black
         stages: [commit]
         language: system
-        entry: poetry run black app tests
+        entry: poetry run black app tests ci
         types: [python]
         exclude: resources_bin.py
 
-    -   id: flake8
-        name: flake8
+    #-   id: flake8
+    #    name: flake8
+    #    stages: [commit]
+    #    language: system
+    #    entry: poetry run flake8 app tests
+    #    types: [python]
+
+    -   id: ruff
+        name: ruff
         stages: [commit]
         language: system
-        entry: poetry run flake8 app tests
+        entry: poetry run ruff app tests ci --fix
         types: [python]
 
     -   id: mypy

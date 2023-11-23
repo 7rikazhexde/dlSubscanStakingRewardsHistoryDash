@@ -13,16 +13,14 @@ class ConfigManage:
         self.__config_cryptact_info = self.__config["cryptact_info"]
 
     # Getter for Subscan API information
-    def get_subscan_api_info(self):
+    @property
+    def subscan_api_info(self):
         return self.__config_subscan_api_info
 
-    subscan_api_info = property(get_subscan_api_info)
-
     # Getter for Subscan API Reference URL
-    def get_subscan_api_doc(self):
+    @property
+    def subscan_api_doc(self):
         return self.__config_subscan_api_doc
-
-    subscan_api_doc = property(get_subscan_api_doc)
 
     # Method to obtain Subscan API Acount
     def get_subscan_api_info_address(self, token):
@@ -31,13 +29,11 @@ class ConfigManage:
         return address_token_value
 
     # Getter for Subscan API Acount Address
-    def get_cryptact_info(self):
+    @property
+    def cryptact_info(self):
         return self.__config_cryptact_info
 
-    cryptact_info = property(get_cryptact_info)
-
     # Getter for obtain UI infomation
-    def get_ui_info(self):
+    @property
+    def ui_info(self):
         return self.__config_ui_info
-
-    ui_info = property(get_ui_info)

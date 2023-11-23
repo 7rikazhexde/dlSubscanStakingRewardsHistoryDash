@@ -13,7 +13,8 @@ class CryptactInfo:
         self.__base = config_cryptact_info[__base_token]
 
     # Getter for the Cryptact Header Infomation
-    def get_cryptact_custom_header_data(self):
+    @property
+    def cryptact_info(self):
         return (
             self.__action,
             self.__source,
@@ -23,5 +24,3 @@ class CryptactInfo:
             self.__fee,
             self.__feeccy,
         )
-
-    cryptact_info = property(get_cryptact_custom_header_data)

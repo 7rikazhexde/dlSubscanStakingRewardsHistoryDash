@@ -35,28 +35,27 @@ class SubscanStakingRewardsDataFrame:
         ]
 
     # Accessor for DataFrame for Reward&Slash
-    def get_stkrwd_header_df(self):
+    @property
+    def df_stkrwd_header_data(self):
         return self.__df_stkrwd_header_data
 
-    def set_stkrwd_header_df(self, df):
+    @df_stkrwd_header_data.setter
+    def df_stkrwd_header_data(self, df):
         self.__df_stkrwd_header_data = pd.concat([self.__df_stkrwd_header_data, df])
 
-    df_stkrwd_header_data = property(get_stkrwd_header_df, set_stkrwd_header_df)
-
     # Accessor to list for Response data
-    def get_stkrwd_df_token(self):
+    @property
+    def reward_slash_data_token(self):
         return self.__reward_slash_data_token
 
-    def set_stkrwd_df_token(self, df):
+    @reward_slash_data_token.setter
+    def reward_slash_data_token(self, df):
         self.__reward_slash_data_token = pd.concat([self.__reward_slash_data_token, df])
 
-    reward_slash_data_token = property(get_stkrwd_df_token, set_stkrwd_df_token)
-
     # Accessors for tokens
-    def get_token_data(self):
+    @property
+    def token_data(self):
         return self.__token_data
-
-    token_data = property(get_token_data)
 
     # Method to create a list of StakingRewards to be retrieved from the list element (item) of the received json data
     def get_reward_slash_data(self, item, response_json):
@@ -180,13 +179,13 @@ class SubscanStakingRewardsDataFrameForCryptact(SubscanStakingRewardsDataFrame):
         )
 
     # Accessors to DataFrame for Cryptact custom files
-    def get_cryptact_header_df(self):
+    @property
+    def df_cryptact_header_data(self):
         return self.__df_cryptact_header_data
 
-    def set_cryptact_header_df(self, df):
+    @df_cryptact_header_data.setter
+    def df_cryptact_header_data(self, df):
         self.__df_cryptact_header_data = pd.concat([self.__df_cryptact_header_data, df])
-
-    df_cryptact_header_data = property(get_cryptact_header_df, set_cryptact_header_df)
 
     def get_reward_slash_data_var_cryptact(
         self, one_line_headerdata_list, cryptact_info_data, adjust_value, digit
@@ -283,15 +282,14 @@ class SubscanApiInfo:
         # row is limited to 100
         self.__data_dict = {"row": 0, "page": 0, "address": self.__address}
 
-    def get_subscan_api_info(self):
+    @property
+    def subscan_api_info(self):
         return (
             self.__api_endpoint,
             self.__headers_dict,
             self.__data_dict,
             self.__adjust_value,
         )
-
-    subscan_api_info = property(get_subscan_api_info)
 
 
 class SubscanStakingRewardDataProcess:
@@ -439,9 +437,14 @@ class SubscanStakingRewardDataProcess:
                     # Extract the number of cases from the data acquired for page_range
                     df_retrieve = concat_df_duplicates.iloc[: self.input_num, :]
                     # Sort
-                    self.sort_df_retrieve = df_retrieve.sort_values(
-                        by=["Date", "Event ID"], ascending=self.sort_type
-                    )
+                    if self.token == "DOT" or self.token == "KSM":
+                        self.sort_df_retrieve = df_retrieve.sort_values(
+                            by=["Date", "Event Index"], ascending=self.sort_type
+                        )
+                    elif self.token == "ASTR":
+                        self.sort_df_retrieve = df_retrieve.sort_values(
+                            by=["Date", "Event ID"], ascending=self.sort_type
+                        )
                     self.sort_df_retrieve["Date"] = pd.to_datetime(
                         self.sort_df_retrieve["Date"]
                     )
@@ -452,7 +455,6 @@ class SubscanStakingRewardDataProcess:
                     self.response_data = self.sort_df_retrieve.values.tolist()
                     # Override by the total value of the list element
                     list_num = list_num_sum
-
         else:
             # self.input_num <= 100
             # Staking API / specification
@@ -502,9 +504,14 @@ class SubscanStakingRewardDataProcess:
                         self.df_header, item, one_line_data_list
                     )
                 # Sort
-                self.sort_df_retrieve = df_page.sort_values(
-                    by=["Date", "Event ID"], ascending=self.sort_type
-                )
+                if self.token == "DOT" or self.token == "KSM":
+                    self.sort_df_retrieve = df_page.sort_values(
+                        by=["Date", "Event Index"], ascending=self.sort_type
+                    )
+                elif self.token == "ASTR":
+                    self.sort_df_retrieve = df_page.sort_values(
+                        by=["Date", "Event ID"], ascending=self.sort_type
+                    )
                 self.sort_df_retrieve["Date"] = pd.to_datetime(
                     self.sort_df_retrieve["Date"]
                 )
