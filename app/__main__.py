@@ -60,7 +60,7 @@ history_type_div = html.Div(
                 dcc.RadioItems(
                     id="radio_history_type",
                     options=history_type_list,
-                    value=history_type_list[0],
+                    value=history_type_list[1],
                     inline=True,
                 ),
             ],
@@ -79,7 +79,7 @@ token_sort_div = html.Div(
                 dcc.Dropdown(
                     id="drop_down_div",
                     options=[dict(label=x, value=x) for x in token_data_list],
-                    value=token_data_list[0],
+                    value=token_data_list[2],
                     clearable=False,
                     style={"margin-left": "5px", "width": "105px"},
                 ),
@@ -115,7 +115,7 @@ address_input_div = html.Div(
         dcc.Input(
             id="input_num",
             type="number",
-            value=50,
+            value=2,
             min=1,
             max=5000,
             step=1,

@@ -16,6 +16,7 @@ Web app version of [dlSubscanStakingRewardsHistory](https://github.com/7rikazhex
       - [Note](#note)
     - [\[Optional\] Development environment](#optional-development-environment)
     - [2. Subscan API Settings](#2-subscan-api-settings)
+      - [Supplementation](#supplementation)
     - [3. Application Execution](#3-application-execution)
     - [4. Application Operations](#4-application-operations)
       - [Notes](#notes-2)
@@ -44,11 +45,15 @@ Save data in the following formats as csv files using Dash, Ploly, and Subscan A
 
 StakingRewards is obtained by specifying the following `Request URL` for each token according to the [API Endpoint](https://support.subscan.io/#api-endpoints) specification.
 
+<div align="center">
+
 | Token | API         | Request URL     | module_id    | event_id |
 | ----- | ----------- | --------------- | ------------ | -------- |
 | DOT   | V2 API      | reward-slash-v2 | Staking      | Reward   |
 | KSM   | V2 API      | reward-slash-v2 | Staking      | Reward   |
 | ASTR  | Staking API | reward-slash    | dappsstaking | Reward   |
+
+</div>
 
 ### Notes
 
@@ -83,17 +88,17 @@ If you use a development environment that supports static analysis tools, see \[
 
 1. Get project
 
-```
-git clone https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash.git
-```
+    ```bash
+    git clone https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash.git
+    ```
 
-2. Setup of virtual environment
+1. Setup of virtual environment
 
 Run the poetry command.
 
-```zsh
-poetry install --no-dev
-```
+    ```bash
+    poetry install --no-dev
+    ```
 
 - If the package DL fails after installation, there may be a problem with the development environment.
 - See [Switching between environments](https://python-poetry.org/docs/managing-environments/#switching-between-environments).
@@ -102,9 +107,9 @@ poetry install --no-dev
 
 Or create a virtual environment with venv, pyenv, etc. and run the following command.
 
-```
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 ### \[Optional\] Development environment
 
@@ -118,19 +123,19 @@ The following static analysis tools are supported in the development environment
 
 1. To create a development environment, do the following
 
-```zsh
-poetry install
-```
+   ```bash
+   poetry install
+   ```
 
-2. How to use the static analysis tool (commands)
+1. How to use the static analysis tool (commands)
 
-```zsh
-poetry run isort app tests
-poetry run black app tests
-poetry run flake8 app tests
-poetry run mypy app tests
-poetry run pytest -s -vv --cov=. --cov-branch --cov-report=html
-```
+   ```bash
+   poetry run isort app tests
+   poetry run black app tests
+   poetry run flake8 app tests
+   poetry run mypy app tests
+   poetry run pytest -s -vv --cov=. --cov-branch --cov-report=html
+   ```
 
 ### 2. Subscan API Settings
 
@@ -139,7 +144,7 @@ poetry run pytest -s -vv --cov=. --cov-branch --cov-report=html
 - Each setting value will be displayed in conjunction with the token information set on the page from which you first accessed the URL. (See below for "Application Operations").
 - Please note that if the values are changed, the system will not operate normally.
 
-**Supplementation**
+#### Supplementation
 
 - The API key is used in the HTTP Request Header information (`X-API-Key`), but the value can be obtained even if not specified.
 - However, the Response data depends on [Rate Limiting](<(https://support.subscan.io/#global-conventions)>).
@@ -150,20 +155,20 @@ poetry run pytest -s -vv --cov=. --cov-branch --cov-report=html
 
 1. Execute the program in a virtual environment
 
-```zsh
-cd app && poetry run python main.py
-```
+    ```bash
+    cd app && poetry run python app
+    ```
 
-2. Application Launch
+1. Application Launch
 
 Please access the URL displayed.
 
-```
-Dash is running on http://127.0.0.1:8050/
+    ```bash
+    Dash is running on http://127.0.0.1:8050/
 
- * Serving Flask app 'main'
- * Debug mode: on
-```
+     * Serving Flask app 'main'
+     * Debug mode: on
+    ```
 
 ### 4. Application Operations
 

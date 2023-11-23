@@ -37,6 +37,14 @@ repos:
         verbose: true
         files: ^pyproject\.toml$
 
+  # Reference: https://github.com/DavidAnson/markdownlint-cli2#overview
+  # > markdownlint-cli is a traditional command-line interface for markdownlint.
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.36.0
+    hooks:
+      - id: markdownlint
+        args: ["--config", ".markdownlint.jsonc", "README.md"]
+
   # Repository local hooks
   - repo: local
     hooks:
@@ -75,13 +83,6 @@ repos:
         language: system
         entry: poetry run mypy
         types: [python]
-
-    -   id: mdformat
-        name: mdformat
-        stages: [commit]
-        language: system
-        entry: poetry run mdformat README.md
-        types: [markdown]
 
     # Original script
     - id: update-pyproject
