@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dlsubscanstakingrewardshistorydash"
-version = "0.2.3"
+version = "0.2.4"
 description = "This is the Dash App version of dlSubscanStakingRewardsHistory."
 authors = ["7rikaz_h785 <7rikaz.h785.stat2ltas41lcijad@gmail.com>"]
 license = "MIT"
@@ -38,11 +38,11 @@ rufffix = "poetry run ruff app tests ci --fix"
 [tool.black]
 target-version = ['py310']
 
-#[tool.isort]
-#profile = "black"
-#
-#[tool.flake8]
-#ignore = ["E501","W503"]
+[tool.isort]
+profile = "black"
+
+[tool.flake8]
+ignore = ["E501","W503"]
 
 [tool.ruff]
 # チェックするルール

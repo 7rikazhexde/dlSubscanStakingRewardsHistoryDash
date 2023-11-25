@@ -13,6 +13,8 @@ Web app version of [dlSubscanStakingRewardsHistory](https://github.com/7rikazhex
     - [Notes](#notes-1)
   - [Usage](#usage)
     - [1. environment building](#1-environment-building)
+    - [For Docker](#for-docker)
+    - [For Local (Linux/Mac/Windows)](#for-local-linuxmacwindows)
       - [Note](#note)
     - [\[Optional\] Development environment](#optional-development-environment)
     - [2. Subscan API Settings](#2-subscan-api-settings)
@@ -82,6 +84,28 @@ The Reward&Slash data displayed in the following demo uses [address](https://pol
 
 ### 1. environment building
 
+### For Docker
+
+A container based on the service specified in `docker-compose.yaml` (the `app` service) is built, started, and the application is executed.
+
+1. Get project
+
+    ```bash
+    git clone https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash.git
+    ```
+
+2. Container construction and startup
+
+    ```bash
+    docker compose up -d --build
+
+    # Affer build
+    docker-compose stop
+    docker-compose start
+    ```
+
+### For Local (Linux/Mac/Windows)
+
 #### Note
 
 If you use a development environment that supports static analysis tools, see \[Optional\] Development environment.
@@ -115,10 +139,11 @@ Or create a virtual environment with venv, pyenv, etc. and run the following com
 
 The following static analysis tools are supported in the development environment
 
-- [isort](https://pypi.org/project/isort/): automatic organization of import statements
-- [black](https://pypi.org/project/black/): code formatter for Python (PEP8 compliant)
-- [flake8](https://pypi.org/project/flake8/): grammar checking
-- [mypy](https://pypi.org/project/mypy/): type checking with type annotations
+- [isort](https://pypi.org/project/isort/): Automatic organization of import statements
+- [black](https://pypi.org/project/black/): Code formatter for Python (PEP8 compliant)
+- [flake8](https://pypi.org/project/flake8/): Grammar checking
+- [ruff](https://pypi.org/project/ruff/): An extremely fast Python linter and code formatter, written in Rust.
+- [mypy](https://pypi.org/project/mypy/): Type checking with type annotations
 - [pytest](https://pypi.org/project/pytest/): A framework for writing unit tests created for Python.
 
 1. To create a development environment, do the following
@@ -130,10 +155,12 @@ The following static analysis tools are supported in the development environment
 1. How to use the static analysis tool (commands)
 
    ```bash
-   poetry run isort app tests
-   poetry run black app tests
-   poetry run flake8 app tests
-   poetry run mypy app tests
+   poetry run task isort
+   poetry run task black
+   poetry run task flake8
+   poetry run task mypy
+   poetry run task ruffch
+   poetry run task rufffix
    poetry run pytest -s -vv --cov=. --cov-branch --cov-report=html
    ```
 
@@ -156,7 +183,7 @@ The following static analysis tools are supported in the development environment
 1. Execute the program in a virtual environment
 
     ```bash
-    cd app && poetry run python app
+    poetry run python app
     ```
 
 1. Application Launch
