@@ -1,0 +1,24 @@
+# Docker Compose version specification
+version: '3'
+services:
+  # Configuration for the app service
+  app:
+    # Build based on the current directory
+    build: .
+    # Specify the container name
+    container_name: 'dlssrhd'
+    # Enable allocation of a pseudo-TTY
+    tty: true
+    # Volume mount settings
+    volumes:
+      - ./app:/dlSubscanStakingRewardsHistoryDash/app
+      - ./tests:/dlSubscanStakingRewardsHistoryDash/tests
+      - ./ci:/dlSubscanStakingRewardsHistoryDash/ci
+      - ./pyproject.toml:/dlSubscanStakingRewardsHistoryDash/pyproject.toml
+      - ./poetry.lock:/dlSubscanStakingRewardsHistoryDash/poetry.lock
+      - ./README.md:/dlSubscanStakingRewardsHistoryDash/README.md
+    # Port mapping
+    ports:
+      - 8050:8050
+    # Application startup command
+    command: ["poetry", "run", "python", "app"]

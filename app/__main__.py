@@ -659,9 +659,7 @@ def display_graph(children, token, history_type, sort_type):
 
         # Create object of type datetime
         if not is_datetime64_dtype(df[xaxis_data]):
-            df[xaxis_data] = pd.to_datetime(
-                df[xaxis_data].str.replace("'", ""), format="%Y/%m/%d %H:%M:%S"
-            )
+            df[xaxis_data] = pd.to_datetime(df[xaxis_data].str.replace("'", ""))
 
         # Sort Data
         num = len(df)
@@ -703,7 +701,7 @@ def display_graph(children, token, history_type, sort_type):
 
 if __name__ == "__main__":
     # To allow access from other computers on the local network
-    # app.run(debug=True,host='0.0.0.0')
+    app.run(debug=True, host="0.0.0.0", port=8050)
     # To allow access only from your own computer
     # If you want to use the Dash Dev Tools, set dev_tools_ui=True.
-    app.run(debug=True, dev_tools_ui=False)
+    # app.run(debug=True, dev_tools_ui=False)

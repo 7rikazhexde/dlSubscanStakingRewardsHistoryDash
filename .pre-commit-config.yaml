@@ -19,10 +19,23 @@ repos:
       # yaml syntax check
       - id: check-yaml
 
+  # https://github.com/pryorda/dockerfilelint-precommit-hooks#usage
+  - repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
+    rev: v0.1.0
+    hooks:
+      - id: dockerfilelint
+        stages: [commit]
+
+  # https://github.com/IamTheFij/docker-pre-commit#installation
+  - repo: https://github.com/iamthefij/docker-pre-commit
+    rev: v3.0.1
+    hooks:
+      - id: docker-compose-check
+
   # https://python-poetry.org/docs/pre-commit-hooks/#usage
   - repo: https://github.com/python-poetry/poetry
-    # Cannot be executed with local designation (as of 23.5.31)
-    rev: 1.5.1
+    # Cannot be executed with local designation (as of 23.11.25)
+    rev: 1.7.1
     hooks:
       - id: poetry-check
         verbose: true
