@@ -10,7 +10,11 @@ class DccManage:
 
         # sort_list selection read
         self.__sort_list = config_ui_info["sort_list"]
-        self.__sort_type = self.__sort_list[0]
+        self.__sort = self.__sort_list[0]
+
+        # stk_type_list
+        self.__stk_type_list = config_ui_info["stk_type_list"]
+        self.__stk_type = self.__stk_type_list[0]
 
     # Setter/Getter for token information
     @property
@@ -38,3 +42,12 @@ class DccManage:
     @sort_list.setter
     def sort_list(self, sort_type_list):
         self.__sort_list = sort_type_list
+
+    # Setter/Getter for staking type list information
+    @property
+    def stk_type_list(self):
+        return self.__stk_type_list
+
+    @stk_type_list.setter
+    def stk_type_list(self, stk_type_list):
+        self.__stk_type_list = stk_type_list

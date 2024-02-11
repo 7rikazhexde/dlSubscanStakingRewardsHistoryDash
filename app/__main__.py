@@ -20,6 +20,7 @@ ROW_PER_PAGE = 20
 
 # Create the actual state (instance) of the application
 app = Dash(__name__, suppress_callback_exceptions=True)
+app.title = "dlSubscanStakingRewardsHistoryDash"
 
 # Create an instance of a class that references config.ini
 config_manage = ConfigManage()
@@ -30,6 +31,7 @@ dcc_manage = DccManage(config_manage.subscan_api_info, config_manage.ui_info)
 token_data_list = dcc_manage.token_data_list
 history_type_list = dcc_manage.history_type_list
 sort_list = dcc_manage.sort_list
+stk_type_list = dcc_manage.stk_type_list
 
 # DataFrame object to be displayed in the data_table component at startup
 data_list = [["data1", 1], ["data2", 2]]
@@ -60,7 +62,7 @@ history_type_div = html.Div(
                 dcc.RadioItems(
                     id="radio_history_type",
                     options=history_type_list,
-                    value=history_type_list[1],
+                    value=history_type_list[0],
                     inline=True,
                 ),
             ],
@@ -79,9 +81,18 @@ token_sort_div = html.Div(
                 dcc.Dropdown(
                     id="drop_down_div",
                     options=[dict(label=x, value=x) for x in token_data_list],
-                    value=token_data_list[2],
+                    value=token_data_list[0],
                     clearable=False,
                     style={"margin-left": "5px", "width": "105px"},
+                ),
+                html.Div(
+                    "StakingType:", style={"font-weight": "bold", "margin-left": "15px"}
+                ),
+                dcc.RadioItems(
+                    id="stk_type",
+                    options=stk_type_list,
+                    value=stk_type_list[0],
+                    inline=True,
                 ),
                 html.Div("Sort:", style={"font-weight": "bold", "margin-left": "15px"}),
                 dcc.RadioItems(
@@ -284,7 +295,7 @@ app.layout = html.Div(
     Input("confirm_error_dialog", "submit_n_clicks"),
 )
 def check_confirm_dialog(submit_n_clicks):
-    if submit_n_clicks:
+    if submit_n_clicks and config_manage.is_error is False:
         # Open the Subscan API Document
         webbrowser.open("https://support.subscan.io/#http-status-codes")
         return no_update
@@ -414,10 +425,13 @@ def update_selecter(token):
     State("radio_history_type", "value"),
     State("drop_down_div", "value"),
     State("input_num", "value"),
+    State("stk_type", "value"),
     State("radio_sort", "value"),
     prevent_initial_call=True,
 )
-def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
+def get_subscan_stkrwd(
+    n_clicks, address, history_type, token, num, stk_type, sort_type
+):
     # variable initialization
     is_error = False
     text = None
@@ -426,10 +440,33 @@ def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
     response_data_info = ""
     supplement = ""
 
+    # Check StakingRewards Type Error
+    is_error, text = is_stkrwd_type_support_check(token, stk_type)
+
+    if is_error is True:
+        confirm_dialog_flag = True
+        message = text
+        response_data_info = ""
+        config_manage.is_error = True
+        return (
+            confirm_dialog_flag,
+            message,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            response_data_info,
+            {"display": "none"},
+            {"display": "none"},
+        )
+
     # HTTP POST Request
     if history_type == "Reward&Slash":
         stkrwd = SubscanStakingRewardDataProcess(
-            num, config_manage.subscan_api_info, token, address, sort_type
+            num, config_manage.subscan_api_info, token, address, stk_type, sort_type
         )
         (
             response_code,
@@ -447,6 +484,7 @@ def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
             config_manage.cryptact_info,
             token,
             address,
+            stk_type,
             sort_type,
         )
         (
@@ -459,7 +497,7 @@ def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
             list_num,
         ) = cyrptactcustom.create_stakerewards_cryptact_cutom_df()
 
-    # Check Error
+    # Check Response Data Error
     is_error, text = is_error_check(response_code, response_status_code, list_num)
 
     # Recieve data processing
@@ -542,6 +580,21 @@ def get_subscan_stkrwd(n_clicks, address, history_type, token, num, sort_type):
 
 
 # error-determining function
+def is_stkrwd_type_support_check(token, stk_type):
+    result = False
+    text = ""
+    if token == "ASTR" and stk_type == "NominationPool":
+        result = True
+        text = (
+            "ASTR does not support NominationPool.\n"
+            "Please submit the Nominator specification.\n"
+        )
+    else:
+        pass
+    return result, text
+
+
+# error-determining function
 def is_error_check(response_code, response_status_code, list_num):
     result = False
     text = ""
@@ -588,9 +641,10 @@ def is_error_check(response_code, response_status_code, list_num):
     Input("dash_table_title", "children"),
     State("drop_down_div", "value"),
     State("radio_history_type", "value"),
+    State("stk_type", "value"),
     State("radio_sort", "value"),
 )
-def display_graph(children, token, history_type, sort_type):
+def display_graph(children, token, history_type, stk_type, sort_type):
     if children == "":
         raise PreventUpdate
     else:
@@ -606,8 +660,12 @@ def display_graph(children, token, history_type, sort_type):
         # Create layout information for each historical information
         if history_type == "Reward&Slash":
             title = f"{history_type} / {token} / Cumulative Sum Value Date Graph(n={len(df)})"
-            xaxis_data = "Date"
-            yaxis_data = "Value"
+            if stk_type == "Nominator":
+                xaxis_data = "Date"
+                yaxis_data = "Value"
+            elif stk_type == "NominationPool":
+                xaxis_data = "Time"
+                yaxis_data = "Value"
         elif history_type == "CryptactCustom":
             title = f"{history_type} / {token} / Cumulative Sum Volume Timestamp Graph(n={len(df)})"
             xaxis_data = "Timestamp"

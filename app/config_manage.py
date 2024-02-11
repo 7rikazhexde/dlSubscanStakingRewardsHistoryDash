@@ -11,6 +11,7 @@ class ConfigManage:
         ]
         self.__config_ui_info = self.__config["ui_info"]
         self.__config_cryptact_info = self.__config["cryptact_info"]
+        self.__is_error = False
 
     # Getter for Subscan API information
     @property
@@ -37,3 +38,12 @@ class ConfigManage:
     @property
     def ui_info(self):
         return self.__config_ui_info
+
+    # Setter/Getter for the Error occurrence
+    @property
+    def is_error(self):
+        return self.__is_error
+
+    @is_error.setter
+    def is_error(self, is_error):
+        self.__is_error = is_error
