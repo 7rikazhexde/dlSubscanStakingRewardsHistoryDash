@@ -9,14 +9,15 @@ from cryptact import CryptactInfo
 
 
 class SubscanStakingRewardsDataFrame:
-    def __init__(self, config_subscan_api_info, token):
+    def __init__(self, config_subscan_api_info, token, stk):
         # Selected Token
         self.__token_data = token
+        self.__stk_data = stk
 
         # List for creating Reward&Slash tables
         # Reward&Slash / Download all data(csv) / header
         self.__reward_slash_data_header_config = (
-            f"reward_slash_data_header_{token.lower()}"
+            f"reward_slash_data_header_{stk.lower()}_{token.lower()}"
         )
         self.__reward_slash_data_header_token = config_subscan_api_info[
             self.__reward_slash_data_header_config
@@ -29,7 +30,7 @@ class SubscanStakingRewardsDataFrame:
         # List for Response data
         # Staking API / reward-slash-v2(DOT,KSM) / Response / data / list
         # V2 API / reward-slash(ASTR) / Response / data / list
-        reward_slash_data_config = f"reward_slash_data_{token.lower()}"
+        reward_slash_data_config = f"reward_slash_data_{stk.lower()}_{token.lower()}"
         self.__reward_slash_data_token = config_subscan_api_info[
             reward_slash_data_config
         ]
@@ -57,6 +58,11 @@ class SubscanStakingRewardsDataFrame:
     def token_data(self):
         return self.__token_data
 
+    # Accessors for tokens
+    @property
+    def stk_data(self):
+        return self.__stk_data
+
     # Method to create a list of StakingRewards to be retrieved from the list element (item) of the received json data
     def get_reward_slash_data(self, item, response_json):
         stkrwd_data_list = []
@@ -76,31 +82,53 @@ class SubscanStakingRewardsDataFrame:
         # number of significant digits
         digit = "{:." + digit + "f}"
 
-        # variable value
-        # 0 event_index
-        # 1 era
-        # 2 block_timestamp
-        # 3 extrinsic_index
-        # 4 amount
-        # 5 module_id
-        # 6 event_id
-        # 7 stash
-        # 8 account
-        # 9 validator_stash
-        self.__event_index = one_line_headerdata_list[0]
-        self.__era = one_line_headerdata_list[1]
-        self.__date = datetime.utcfromtimestamp(one_line_headerdata_list[2])
-        # Block data is created from event_index
-        self.__block = self.__event_index.split("-")[0]
-        self.__extrinsic_index = one_line_headerdata_list[3]
-        self.__value = float(one_line_headerdata_list[4]) * adjust_value
-        self.__value = digit.format(self.__value)
-        # Action data is created from module_id and event_id
-        self.__action = one_line_headerdata_list[5] + f"({one_line_headerdata_list[6]})"
-        self.__stash = one_line_headerdata_list[7]
-        self.__reward_account = one_line_headerdata_list[8]
+        if self.stk_data == "Nominator":
+            # variable value
+            # 0 event_index
+            # 1 era
+            # 2 block_timestamp
+            # 3 extrinsic_index
+            # 4 amount
+            # 5 module_id
+            # 6 event_id
+            # 7 stash
+            # 8 account
+            # 9 validator_stash
+            self.__event_index = one_line_headerdata_list[0]
+            self.__era = one_line_headerdata_list[1]
+            self.__date = datetime.utcfromtimestamp(one_line_headerdata_list[2])
+            # Block data is created from event_index
+            self.__block = self.__event_index.split("-")[0]
+            self.__extrinsic_index = one_line_headerdata_list[3]
+            self.__value = float(one_line_headerdata_list[4]) * adjust_value
+            self.__value = digit.format(self.__value)
+            # Action data is created from module_id and event_id
+            self.__action = (
+                one_line_headerdata_list[5] + f"({one_line_headerdata_list[6]})"
+            )
+            self.__stash = one_line_headerdata_list[7]
+            self.__reward_account = one_line_headerdata_list[8]
+        elif self.stk_data == "NominationPool":
+            # variable value
+            # 0 event_index
+            # 1 block
+            # 2 extrinsic_index
+            # 3 pool_id
+            # 4 amount
+            # 5 event_id
+            # 6 block_timestamp
+            self.__event_index = one_line_headerdata_list[0]
+            self.__block = one_line_headerdata_list[0].split("-")[0]
+            self.__extrinsic_index = one_line_headerdata_list[1]
+            self.__pool_id = one_line_headerdata_list[2]
+            self.__amount = float(one_line_headerdata_list[3]) * adjust_value
+            self.__amount = digit.format(self.__amount)
+            self.__action = f"nominationpools {one_line_headerdata_list[4]}"
+            self.__block_timestamp = datetime.utcfromtimestamp(
+                one_line_headerdata_list[5]
+            )
 
-        if self.token_data == "DOT":
+        if self.token_data == "DOT" and self.stk_data == "Nominator":
             # Create Validator Stash for Dot as it exists.
             self.__validator_stash = one_line_headerdata_list[9]
             self.__one_line_data_list = [
@@ -115,7 +143,7 @@ class SubscanStakingRewardsDataFrame:
                 self.__reward_account,
                 self.__validator_stash,
             ]
-        elif self.token_data == "KSM":
+        elif self.token_data == "KSM" and self.stk_data == "Nominator":
             self.__one_line_data_list = [
                 self.__event_index,
                 self.__era,
@@ -127,6 +155,28 @@ class SubscanStakingRewardsDataFrame:
                 self.__stash,
                 self.__reward_account,
             ]
+        elif self.token_data == "DOT" and self.stk_data == "NominationPool":
+            # Create Validator Stash for Dot as it exists.
+            self.__one_line_data_list = [
+                self.__event_index,
+                self.__block,
+                self.__extrinsic_index,
+                self.__pool_id,
+                self.__amount,
+                self.__action,
+                self.__block_timestamp,
+            ]
+        elif self.token_data == "KSM" and self.stk_data == "NominationPool":
+            self.__one_line_data_list = [
+                self.__event_index,
+                self.__block,
+                self.__extrinsic_index,
+                self.__pool_id,
+                self.__amount,
+                self.__action,
+                self.__block_timestamp,
+            ]
+
         return self.__one_line_data_list
 
     # Method to create values for ASTR from a list of StakingRewards in list format
@@ -170,8 +220,8 @@ class SubscanStakingRewardsDataFrame:
 
 
 class SubscanStakingRewardsDataFrameForCryptact(SubscanStakingRewardsDataFrame):
-    def __init__(self, config_subscan_api_info, config_cryptact_info, token):
-        super().__init__(config_subscan_api_info, token)
+    def __init__(self, config_subscan_api_info, config_cryptact_info, token, stk):
+        super().__init__(config_subscan_api_info, token, stk)
         # Create DataFrame for Cryptact custom file
         self.__cryptact_heder_data = config_cryptact_info["cryptact_custom_header"]
         self.__df_cryptact_header_data = pd.DataFrame(
@@ -216,9 +266,14 @@ class SubscanStakingRewardsDataFrameForCryptact(SubscanStakingRewardsDataFrame):
         # 9 validator_stash
         if self.token_data == "DOT" or self.token_data == "KSM":
             self.__event_index = one_line_headerdata_list[0]
-            self.__date = datetime.fromtimestamp(one_line_headerdata_list[2])
-            self.__value = float(one_line_headerdata_list[4]) * adjust_value
-            self.__value = digit.format(self.__value)
+            if self.stk_data == "Nominator":
+                self.__date = datetime.fromtimestamp(one_line_headerdata_list[2])
+                self.__value = float(one_line_headerdata_list[4]) * adjust_value
+                self.__value = digit.format(self.__value)
+            elif self.stk_data == "NominationPool":
+                self.__date = datetime.fromtimestamp(one_line_headerdata_list[5])
+                self.__value = float(one_line_headerdata_list[3]) * adjust_value
+                self.__value = digit.format(self.__value)
             self.__one_line_data_list = [
                 self.__date,
                 action,
@@ -258,13 +313,13 @@ class SubscanStakingRewardsDataFrameForCryptact(SubscanStakingRewardsDataFrame):
 
 
 class SubscanApiInfo:
-    def __init__(self, config_subscan_api_info, token, address):
+    def __init__(self, config_subscan_api_info, token, stk, address):
         self.__api_key = str(config_subscan_api_info["api_key"])
 
-        request_url_config = f"request_url_{token.lower()}"
+        request_url_config = f"request_url_{stk.lower()}_{token.lower()}"
         api_host_config = f"api_host_{token.lower()}"
         # address_cnfig       = f'address_{token.lower()}'
-        adjust_value_config = f"adjust_value_{token.lower()}"
+        adjust_value_config = f"adjust_value_{stk.lower()}_{token.lower()}"
 
         self.__request_url = config_subscan_api_info[request_url_config]
         self.__api_host = config_subscan_api_info[api_host_config]
@@ -293,12 +348,14 @@ class SubscanApiInfo:
 
 
 class SubscanStakingRewardDataProcess:
-    def __init__(self, input_num, config_subscan_api_info, token, address, sort):
+    def __init__(self, input_num, config_subscan_api_info, token, address, stk, sort):
         # Instance Creation
         self.subscan_stkrwd_df = SubscanStakingRewardsDataFrame(
-            config_subscan_api_info, token
+            config_subscan_api_info, token, stk
         )
-        self.subscan_api_data = SubscanApiInfo(config_subscan_api_info, token, address)
+        self.subscan_api_data = SubscanApiInfo(
+            config_subscan_api_info, token, stk, address
+        )
 
         # Dataframe initialization with get_stkrwd_header_df method
         self.df_header = self.subscan_stkrwd_df.df_stkrwd_header_data
@@ -323,6 +380,9 @@ class SubscanStakingRewardDataProcess:
         # Token Setting
         self.token = token
 
+        # Staking Type Setting
+        self.stk = stk
+
         # Sort Information Setting
         if sort == "Ascending":
             self.sort_type = True
@@ -335,7 +395,7 @@ class SubscanStakingRewardDataProcess:
         self.sort_df_retrieve = pd.DataFrame(data_list, columns=["culumn1", "culumn2"])
 
         # Config information acquisition
-        display_digit_config = f"display_digit_{token.lower()}"
+        display_digit_config = f"display_digit_{stk.lower()}_{token.lower()}"
         # The number of significant digits is -1 to be handled by the format method
         self.digit = str(int(config_subscan_api_info[display_digit_config]) - 1)
 
@@ -345,6 +405,21 @@ class SubscanStakingRewardDataProcess:
 
         # Initialize total value of list element
         list_num_sum = 0
+
+        # Sort list
+        if self.stk == "Nominator":
+            sort_val_pri1 = "Date"
+            sort_val_pri2 = "Event Index"
+            if self.token == "ASTR":
+                sort_val_pri2 = "Event ID"
+            sort_val_list = [sort_val_pri1, sort_val_pri2]
+        elif self.stk == "NominationPool":
+            sort_val_pri1 = "Time"
+            sort_val_pri2 = "Event ID"
+            if self.token == "ASTR":
+                sort_val_pri1 = "Date"
+                sort_val_pri2 = "Event ID"
+            sort_val_list = [sort_val_pri1, sort_val_pri2]
 
         # If input_num is greater than 100, row has an upper limit of 100,
         # so the number of processing times is calculated from the number of cases, and every 100 cases is obtained.
@@ -439,17 +514,17 @@ class SubscanStakingRewardDataProcess:
                     # Sort
                     if self.token == "DOT" or self.token == "KSM":
                         self.sort_df_retrieve = df_retrieve.sort_values(
-                            by=["Date", "Event Index"], ascending=self.sort_type
+                            by=sort_val_list, ascending=self.sort_type
                         )
                     elif self.token == "ASTR":
                         self.sort_df_retrieve = df_retrieve.sort_values(
-                            by=["Date", "Event ID"], ascending=self.sort_type
+                            by=sort_val_list, ascending=self.sort_type
                         )
-                    self.sort_df_retrieve["Date"] = pd.to_datetime(
-                        self.sort_df_retrieve["Date"]
+                    self.sort_df_retrieve[sort_val_pri1] = pd.to_datetime(
+                        self.sort_df_retrieve[sort_val_pri1]
                     )
-                    self.sort_df_retrieve["Date"] = self.sort_df_retrieve[
-                        "Date"
+                    self.sort_df_retrieve[sort_val_pri1] = self.sort_df_retrieve[
+                        sort_val_pri1
                     ].dt.strftime("%Y-%m-%d %H:%M:%S")
                     # List extracted data
                     self.response_data = self.sort_df_retrieve.values.tolist()
@@ -506,17 +581,17 @@ class SubscanStakingRewardDataProcess:
                 # Sort
                 if self.token == "DOT" or self.token == "KSM":
                     self.sort_df_retrieve = df_page.sort_values(
-                        by=["Date", "Event Index"], ascending=self.sort_type
+                        by=sort_val_list, ascending=self.sort_type
                     )
                 elif self.token == "ASTR":
                     self.sort_df_retrieve = df_page.sort_values(
-                        by=["Date", "Event ID"], ascending=self.sort_type
+                        by=sort_val_list, ascending=self.sort_type
                     )
-                self.sort_df_retrieve["Date"] = pd.to_datetime(
-                    self.sort_df_retrieve["Date"]
+                self.sort_df_retrieve[sort_val_pri1] = pd.to_datetime(
+                    self.sort_df_retrieve[sort_val_pri1]
                 )
-                self.sort_df_retrieve["Date"] = self.sort_df_retrieve[
-                    "Date"
+                self.sort_df_retrieve[sort_val_pri1] = self.sort_df_retrieve[
+                    sort_val_pri1
                 ].dt.strftime("%Y-%m-%d %H:%M:%S")
                 # List extracted data
                 self.response_data = self.sort_df_retrieve.values.tolist()
@@ -550,13 +625,16 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
         config_cryptact_info,
         token,
         address,
+        stk,
         sort,
     ):
         # Create Instance
         self.subscan_stkrwd_df_for_cryptact = SubscanStakingRewardsDataFrameForCryptact(
-            config_subscan_api_info, config_cryptact_info, token
+            config_subscan_api_info, config_cryptact_info, token, stk
         )
-        self.subscan_api_data = SubscanApiInfo(config_subscan_api_info, token, address)
+        self.subscan_api_data = SubscanApiInfo(
+            config_subscan_api_info, token, stk, address
+        )
         self.cryptact_info_data = CryptactInfo(config_cryptact_info, token)
 
         # dataframe initialization with get_cryptact_header_df method
@@ -591,7 +669,7 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
         self.sort_df_retrieve = pd.DataFrame(data_list, columns=["culumn1", "culumn2"])
 
         # Config information acquisition
-        display_digit_config = f"display_digit_{token.lower()}"
+        display_digit_config = f"display_digit_{stk.lower()}_{token.lower()}"
         # The number of significant digits is -1 to be handled by the format method
         self.digit = str(int(config_subscan_api_info[display_digit_config]) - 1)
 

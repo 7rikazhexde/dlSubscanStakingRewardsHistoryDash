@@ -11,7 +11,7 @@ token_list = [ "DOT", "KSM", "ASTR",]
 # API Key(User-defined required)
 # The API key is used in the HTTP Request Header information (X-API-Key), but the value can be obtained even if not specified.
 # However, Response data depends on Rate Limiting (Reference: Global Conventions).
-# If a large value is specified for the number of requests, "429 Too Many Requests" may result, and the function may not work properly. 
+# If a large value is specified for the number of requests, "429 Too Many Requests" may result, and the function may not work properly.
 # Please obtain an API key when using this service.
 api_key = ""
 
@@ -20,62 +20,74 @@ subscan_api_doc = "[ https://docs.api.subscan.io/#introduction ]"
 
 # DOT Token(Defined in V2 API specification)
 # API Host
-request_url_dot = "/api/v2/scan/account/reward_slash"
+request_url_nominator_dot = "/api/v2/scan/account/reward_slash"
+request_url_nominationpool_dot = "/api/scan/nomination_pool/rewards"
 # Endpoint URL
 api_host_dot = "https://polkadot.api.subscan.io"
 # column name
-reward_slash_data_header_dot = [ "Event Index", "Era", "Date", "Block", "Extrinsic Index", "Value", "Action", "Stash", "Reward Account", "Validator Stash",]
+reward_slash_data_header_nominator_dot = [ "Event Index", "Era", "Date", "Block", "Extrinsic Index", "Value", "Action", "Stash", "Reward Account", "Validator Stash",]
+reward_slash_data_header_nominationpool_dot = [ "Event ID", "Block", "Extrinsic ID", "Pool", "Value", "Action", "Time",]
 # Response Description
-reward_slash_data_dot = [ "event_index", "era", "block_timestamp", "extrinsic_index", "amount", "module_id", "event_id", "stash", "account", "validator_stash",]
+reward_slash_data_nominator_dot = [ "event_index", "era", "block_timestamp", "extrinsic_index", "amount", "module_id", "event_id", "stash", "account", "validator_stash",]
+reward_slash_data_nominationpool_dot = [ "event_index", "extrinsic_index", "pool_id", "amount", "event_id","block_timestamp",]
 # Acount Address
 # If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
 address_dot = ""
 # decimal point adjustment value(User-defined required)
-adjust_value_dot = 1e-10
+adjust_value_nominator_dot = 1e-10
+adjust_value_nominationpool_dot = 1e-10
 # number of significant digits(User-defined required)
 # ex) three-digit number: 1.234 -> 1.23
-display_digit_dot = 11
+display_digit_nominator_dot = 11
+display_digit_nominationpool_dot = 11
 
 # KSM Token(Defined in V2 API specification)
 # API Host
-request_url_ksm = "/api/v2/scan/account/reward_slash"
+request_url_nominator_ksm = "/api/v2/scan/account/reward_slash"
+request_url_nominationpool_ksm = "/api/v2/scan/account/reward_slash"
 # Endpoint URL
 api_host_ksm = "https://kusama.api.subscan.io"
 # column name
-reward_slash_data_header_ksm = [ "Event Index", "Era", "Date", "Block", "Extrinsic Index", "Value", "Action", "Stash", "Reward Account",]
+reward_slash_data_header_nominator_ksm = [ "Event Index", "Era", "Date", "Block", "Extrinsic Index", "Value", "Action", "Stash", "Reward Account",]
+reward_slash_data_header_nominationpool_ksm = [ "Event Index", "Era", "Date", "Block", "Extrinsic Index", "Value", "Action", "Stash", "Reward Account",]
 # Response Description
-reward_slash_data_ksm = [ "event_index", "era", "block_timestamp", "extrinsic_index", "amount", "module_id", "event_id", "stash", "account",]
+reward_slash_data_nominator_ksm = [ "event_index", "era", "block_timestamp", "extrinsic_index", "amount", "module_id", "event_id", "stash", "account",]
+reward_slash_data_nominationpool_ksm = [ "event_index", "era", "block_timestamp", "extrinsic_index", "amount", "module_id", "event_id", "stash", "account",]
 # Acount Address
 # If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
 address_ksm = ""
 # decimal point adjustment value(User-defined required)
-adjust_value_ksm = 1e-12
+adjust_value_nominator_ksm = 1e-12
+adjust_value_nominationpool_ksm = 1e-12
 # number of significant digits(User-defined required)
 # ex) three-digit number: 1.234 -> 1.23
-display_digit_ksm = 11
+display_digit_nominator_ksm = 11
+display_digit_nominationpool_ksm = 11
 
 # ASTR Token(Defined in Staking API specification)
 # API Host
-request_url_astr = "/api/scan/account/reward_slash"
+request_url_nominator_astr = "/api/scan/account/reward_slash"
 # Endpoint URL
 api_host_astr = "https://astar.api.subscan.io"
 # column name
-reward_slash_data_header_astr = [ "Event ID", "Date", "Block", "Extrinsic Hash", "Value", "Action",]
+reward_slash_data_header_nominator_astr = [ "Event ID", "Date", "Block", "Extrinsic Hash", "Value", "Action",]
 # Response Description
-reward_slash_data_astr = [ "event_index", "block_timestamp", "block_num", "extrinsic_hash", "amount", "module_id", "event_id",]
+reward_slash_data_nominator_astr = [ "event_index", "block_timestamp", "block_num", "extrinsic_hash", "amount", "module_id", "event_id",]
 # Acount Address
 # If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
 address_astr = ""
 # decimal point adjustment value(User-defined required)
-adjust_value_astr = 1e-18
+adjust_value_nominator_astr = 1e-18
 # number of significant digits(User-defined required)
 # ex) three-digit number: 1.234 -> 1.23
-display_digit_astr = 15
+display_digit_nominator_astr = 15
 
 # Information used in component_property in Dash Core Components
 [ui_info]
 # History Type
 history_type_list = [ "Reward&Slash", "CryptactCustom",]
+# Sort Type
+stk_type_list = [ "Nominator", "NominationPool",]
 # Sort Type
 sort_list = [ "Ascending", "Descending",]
 
