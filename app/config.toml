@@ -6,7 +6,7 @@
 # Subscan API Infomation
 [subscan_api_info]
 # Token to be acquired(Only three tokens are supported: DOT, KSM, and ASTR.)
-token_list = [ "DOT", "KSM", "ASTR",]
+token_list = [ "DOT", "KSM", "ASTR", "MANTA",]
 
 # API Key(User-defined required)
 # The API key is used in the HTTP Request Header information (X-API-Key), but the value can be obtained even if not specified.
@@ -33,13 +33,22 @@ reward_slash_data_nominationpool_dot = [ "event_index", "extrinsic_index", "pool
 # Acount Address
 # If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
 address_dot = ""
-# decimal point adjustment value(User-defined required)
-adjust_value_nominator_dot = 1e-10
-adjust_value_nominationpool_dot = 1e-10
-# number of significant digits(User-defined required)
-# ex) three-digit number: 1.234 -> 1.23
-display_digit_nominator_dot = 11
-display_digit_nominationpool_dot = 11
+# Decimal point adjustment value(User-defined required)
+adjust_value_nominator_dot = 10
+adjust_value_nominationpool_dot = 10
+# Round decimals to the desired number of digits(User-defined required)
+# print(Decimal(str(num)).quantize(Decimal('1e-10'), ROUND_HALF_UP))
+#                                          ^^^^^^^
+# ex)
+# num = 123.456
+# print(Decimal(str(num)).quantize(Decimal('0'), ROUND_HALF_UP))
+# 123
+# print(Decimal(str(num)).quantize(Decimal('0.1'), ROUND_HALF_UP))
+# 123.5
+# print(Decimal(str(num)).quantize(Decimal('0.01'), ROUND_HALF_UP))
+# 123.46
+exponential_value_nominator_dot = 1e-10
+exponential_value_nominationpool_dot = 1e-10
 
 # KSM Token(Defined in V2 API specification)
 # API Host
@@ -57,12 +66,13 @@ reward_slash_data_nominationpool_ksm = [ "event_index", "era", "block_timestamp"
 # If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
 address_ksm = ""
 # decimal point adjustment value(User-defined required)
-adjust_value_nominator_ksm = 1e-12
-adjust_value_nominationpool_ksm = 1e-12
-# number of significant digits(User-defined required)
-# ex) three-digit number: 1.234 -> 1.23
-display_digit_nominator_ksm = 11
-display_digit_nominationpool_ksm = 11
+adjust_value_nominator_ksm = 13
+adjust_value_nominationpool_ksm = 13
+# Round decimals to the desired number of digits(User-defined required)
+# print(Decimal(str(num)).quantize(Decimal('1e-13'), ROUND_HALF_UP))
+#                                          ^^^^^^^
+exponential_value_nominator_ksm = 1e-13
+exponential_value_nominationpool_ksm = 1e-13
 
 # ASTR Token(Defined in Staking API specification)
 # API Host
@@ -77,10 +87,30 @@ reward_slash_data_nominator_astr = [ "event_index", "block_timestamp", "block_nu
 # If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
 address_astr = ""
 # decimal point adjustment value(User-defined required)
-adjust_value_nominator_astr = 1e-18
-# number of significant digits(User-defined required)
-# ex) three-digit number: 1.234 -> 1.23
-display_digit_nominator_astr = 15
+adjust_value_nominator_astr = 18
+# Round decimals to the desired number of digits(User-defined required)
+# print(Decimal(str(num)).quantize(Decimal('1e-16'), ROUND_HALF_UP))
+#                                          ^^^^^^^
+exponential_value_nominator_astr = 1e-16
+
+# MANTA Token(Defined in Staking API specification)
+# API Host
+request_url_nominator_manta = "/api/scan/account/reward_slash"
+# Endpoint URL
+api_host_manta = "https://manta.api.subscan.io"
+# column name
+reward_slash_data_header_nominator_manta = [ "Event ID", "Date", "Block", "Extrinsic Hash", "Value", "Action",]
+# Response Description
+reward_slash_data_nominator_manta = [ "event_index", "block_timestamp", "block_num", "extrinsic_hash", "amount", "module_id", "event_id",]
+# Acount Address
+# If an address is specified, the address is automatically set in conjunction with the token information selection on the application screen.
+address_manta = ""
+# decimal point adjustment value(User-defined required)
+adjust_value_nominator_manta = 18
+# Round decimals to the desired number of digits(User-defined required)
+# print(Decimal(str(num)).quantize(Decimal('1e-16'), ROUND_HALF_UP))
+#                                          ^^^^^^^
+exponential_value_nominator_manta = 1e-16
 
 # Information used in component_property in Dash Core Components
 [ui_info]
@@ -109,3 +139,5 @@ source_ksm = "CRYPTACT_CUSTOM_KSM"
 base_ksm = "KSM"
 source_astr = "CRYPTACT_CUSTOM_ASTR"
 base_astr = "ASTR"
+source_manta = "CRYPTACT_CUSTOM_MANTA"
+base_manta = "MANTA"

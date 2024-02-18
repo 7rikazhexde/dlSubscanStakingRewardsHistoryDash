@@ -1,6 +1,7 @@
 import webbrowser
 from typing import List
 
+import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
 from config_manage import ConfigManage
@@ -19,7 +20,11 @@ from subscan import (
 ROW_PER_PAGE = 20
 
 # Create the actual state (instance) of the application
-app = Dash(__name__, suppress_callback_exceptions=True)
+app = Dash(
+    __name__,
+    suppress_callback_exceptions=True,
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
+)
 app.title = "dlSubscanStakingRewardsHistoryDash"
 
 # Create an instance of a class that references config.ini
@@ -42,15 +47,46 @@ df_manage = DfManage()
 
 # Layout definition
 # Title(H3)
-title_div = html.H3("Download Subscan Staking&Rewards / Cryptact Custom")
+title_div = html.H3(
+    "Download Subscan Staking&Rewards / Cryptact Custom",
+    style={"margin-left": "5px", "margin-bottom": "10px", "margin-top": "5px"},
+)
 
 # Usage(Button)
-about_project_info = html.Div(
+info_div = html.Div(
     [
-        html.Button("Usage", id="submit_usage", n_clicks=0),
+        # html.Button("Usage", id="submit_usage", n_clicks=0, style={"margin-right": "5px"}),
+        # dbc.Button("Usage", id="submit_usage", n_clicks=0, color="primary", className="mr-2", size="sm",style={"margin-right": "5px"}),
+        dbc.Button(
+            "Usage",
+            id="submit_usage",
+            n_clicks=0,
+            className="mr-2",
+            size="sm",
+            style={
+                "background": "#cbe8fa",
+                "color": "rgb(50, 50, 50)",
+                "margin-left": "5px",
+                "margin-right": "5px",
+                "width": "100px",
+            },
+        ),
         html.Div(id="about_project_info", style={"display": "none"}),
+        # html.Button("Donate", id="submit_donate_info", n_clicks=0),
+        dbc.Button(
+            "Donate",
+            id="submit_donate_info",
+            n_clicks=0,
+            size="sm",
+            style={
+                "background": "#cbe8fa",
+                "color": "rgb(50, 50, 50)",
+                "width": "100px",
+            },
+        ),
+        html.Div(id="donate_info", style={"display": "none"}),
     ],
-    style={"display": "inline-flex"},
+    style={"display": "inline-flex", "margin-bottom": "5px"},
 )
 
 # History type(RadioItems)
@@ -64,9 +100,15 @@ history_type_div = html.Div(
                     options=history_type_list,
                     value=history_type_list[0],
                     inline=True,
+                    style={"margin-left": "5px"},
+                    labelStyle={"margin-right": "2px"},
                 ),
             ],
-            style={"display": "inline-flex", "margin-bottom": "10px"},
+            style={
+                "display": "inline-flex",
+                "margin-bottom": "10px",
+                "margin-left": "5px",
+            },
         ),
         html.Div(""),
     ]
@@ -77,7 +119,7 @@ token_sort_div = html.Div(
     [
         html.Div(
             [
-                html.Div("Token:", style={"font-weight": "bold"}),
+                html.Div("Token:", style={"font-weight": "bold", "margin-left": "5px"}),
                 dcc.Dropdown(
                     id="drop_down_div",
                     options=[dict(label=x, value=x) for x in token_data_list],
@@ -93,10 +135,17 @@ token_sort_div = html.Div(
                     options=stk_type_list,
                     value=stk_type_list[0],
                     inline=True,
+                    style={"margin-left": "5px"},
+                    labelStyle={"margin-right": "2px"},
                 ),
                 html.Div("Sort:", style={"font-weight": "bold", "margin-left": "15px"}),
                 dcc.RadioItems(
-                    id="radio_sort", options=sort_list, value=sort_list[0], inline=True
+                    id="radio_sort",
+                    options=sort_list,
+                    value=sort_list[0],
+                    inline=True,
+                    style={"margin-left": "5px"},
+                    labelStyle={"margin-right": "2px"},
                 ),
             ],
             style={
@@ -113,7 +162,9 @@ token_sort_div = html.Div(
 # Acount Address(Input & Button)
 address_input_div = html.Div(
     [
-        html.Div("Acount Address:", style={"font-weight": "bold"}),
+        html.Div(
+            "Acount Address:", style={"font-weight": "bold", "margin-left": "5px"}
+        ),
         dcc.Input(
             id="input_address",
             type="text",
@@ -126,17 +177,29 @@ address_input_div = html.Div(
         dcc.Input(
             id="input_num",
             type="number",
-            value=2,
+            value=50,
             min=1,
             max=5000,
             step=1,
             style={"margin-left": "5px", "height": "25px"},
         ),
-        html.Button(
+        # html.Button(
+        #    "Submit",
+        #    id="submit",
+        #    n_clicks=0,
+        #    style={"margin-left": "5px", "height": "30px", "background": "#cbe8fa"},
+        # ),
+        dbc.Button(
             "Submit",
             id="submit",
             n_clicks=0,
-            style={"margin-left": "5px", "height": "30px", "background": "#cbe8fa"},
+            className="mr-2",
+            size="sm",
+            style={
+                "background": "#cbe8fa",
+                "color": "rgb(50, 50, 50)",
+                "margin-left": "5px",
+            },
         ),
     ],
     style={"display": "inline-flex", "align-items": "center", "margin-bottom": "10px"},
@@ -145,7 +208,9 @@ address_input_div = html.Div(
 # Select Table(Div)
 select_table_div = html.Div(
     [
-        html.Div("Select Table Data: ", style={"font-weight": "bold"}),
+        html.Div(
+            "Select Table Data: ", style={"font-weight": "bold", "margin-left": "5px"}
+        ),
         html.Div(
             id="select_table_info",
             children="No Data Selection",
@@ -165,7 +230,10 @@ result_responsedata_info = html.Div(
     [
         html.Div(
             [
-                html.Div("Response Data Info:", style={"font-weight": "bold"}),
+                html.Div(
+                    "Response Data Info:",
+                    style={"font-weight": "bold", "margin-left": "5px"},
+                ),
                 html.Div(
                     id="response_data_info",
                     children="No Response Data",
@@ -195,6 +263,7 @@ dash_data_table = html.Div(
                 "color": "rgb(50, 50, 50)",
                 "font-size": "115%",
                 "margin-bottom": "10px",
+                "margin-left": "5px",
             },
         ),
         dash_table.DataTable(
@@ -205,7 +274,7 @@ dash_data_table = html.Div(
             style_cell=dict(
                 textAlign="left",
                 minWidth="50px",
-                width="100px",
+                width="130px",
                 maxWidth="200px",
                 overflow="hidden",
                 textOverflow="ellipsis",
@@ -215,7 +284,7 @@ dash_data_table = html.Div(
             sort_action="none",
             export_format="csv",
             page_size=10,
-            style_table=dict(height="280px", overflowY="auto"),
+            style_table=dict(height="280px", overflowY="auto", marginLeft="5px"),
         ),
     ]
 )
@@ -223,14 +292,29 @@ dash_data_table = html.Div(
 # Export(Button)
 # Change the style of the export button
 # https://community.plotly.com/t/styling-the-export-button-in-datatable/38798/9
-export_button = html.Button(
+# export_button = html.Button(
+#    "Download CSV",
+#    id="export_table",
+#    style={
+#        "backgroundColor": "paleturquoise",
+#        "margin-top": "5px",
+#    },
+#    **{"data-text": ""},
+# )
+
+export_button = dbc.Button(
     "Download CSV",
     id="export_table",
+    n_clicks=0,
+    color="primary",
+    className="mr-2",
+    size="sm",
     style={
-        "backgroundColor": "paleturquoise",
-        "margin-top": "5px",
+        "background": "#cbe8fa",
+        "color": "rgb(50, 50, 50)",
+        "margin-left": "5px",
+        "width": "180px",
     },
-    **{"data-text": ""},
 )
 
 show_graph_button = html.Button(
@@ -243,7 +327,7 @@ show_graph_button = html.Button(
 # 2D-Graph(Div)
 graph_div = html.Div(
     [
-        dcc.Graph(id="date_cumsum_graph"),
+        dcc.Graph(id="date_cumsum_graph", style={"margin-left": "5px"}),
     ],
     id="graph_div",
     style={"display": "none"},
@@ -273,7 +357,7 @@ confirm_dialog = html.Div(
 app.layout = html.Div(
     [
         title_div,
-        about_project_info,
+        info_div,
         history_type_div,
         token_sort_div,
         address_input_div,
@@ -308,11 +392,27 @@ def check_confirm_dialog(submit_n_clicks):
 @app.callback(
     Output("about_project_info", "children"), Input("submit_usage", "n_clicks")
 )
-def open_url(n_clicks):
+def open_url_about_project_info(n_clicks):
     if n_clicks:
         # Open the GitHub README.md
         webbrowser.open(
             "https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash#readme"
+        )
+        return no_update
+    raise PreventUpdate
+
+
+# Callback function to Doate Div / children triggered by Doate Button / n_clicks
+# Summary:
+#  - Pressing the Usage button takes you to EADME.md on GitHub
+@app.callback(
+    Output("donate_info", "children"), Input("submit_donate_info", "n_clicks")
+)
+def open_url_donate_info(n_clicks):
+    if n_clicks:
+        # Open the GitHub README.md
+        webbrowser.open(
+            "https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash?tab=readme-ov-file#donate"
         )
         return no_update
     raise PreventUpdate
@@ -552,6 +652,9 @@ def get_subscan_stkrwd(
             elif history_type == "CryptactCustom":
                 title = f"{history_type} / {token} dash_table(n={len(df)})"
             dash_table_title_text = title
+            # Numeric data displayed in DataTable is limited to 16 digits by default
+            # Converting data (DataFrame) to string so that data with more than 16 digits can be displayed
+            df = df.astype(str)
             data = df.to_dict("records")
             columns = [
                 {"name": str(i), "id": str(i), "deletable": False, "renamable": False}
@@ -581,16 +684,14 @@ def get_subscan_stkrwd(
 
 # error-determining function
 def is_stkrwd_type_support_check(token, stk_type):
-    result = False
-    text = ""
-    if token == "ASTR" and stk_type == "NominationPool":
-        result = True
-        text = (
-            "ASTR does not support NominationPool.\n"
-            "Please submit the Nominator specification.\n"
-        )
-    else:
-        pass
+    error_messages = {
+        "ASTR": "ASTR does not support NominationPool.\nPlease submit the Nominator specification.\n",
+        "MANTA": "MANTA does not support NominationPool.\nPlease submit the Nominator specification.\n",
+    }
+
+    result = token in error_messages and stk_type == "NominationPool"
+    text = error_messages.get(token, "")
+
     return result, text
 
 
@@ -759,7 +860,7 @@ def display_graph(children, token, history_type, stk_type, sort_type):
 
 if __name__ == "__main__":
     # To allow access from other computers on the local network
-    app.run(debug=True, host="0.0.0.0", port=8050)
+    # app.run(debug=True, host="0.0.0.0", port=8050)
     # To allow access only from your own computer
     # If you want to use the Dash Dev Tools, set dev_tools_ui=True.
-    # app.run(debug=True, dev_tools_ui=False)
+    app.run(debug=True, dev_tools_ui=False)

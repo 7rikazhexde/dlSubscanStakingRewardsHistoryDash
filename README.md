@@ -10,13 +10,15 @@ Web app version of [dlSubscanStakingRewardsHistory](https://github.com/7rikazhex
     - [Supported tokens and Subscan API information](#supported-tokens-and-subscan-api-information)
     - [Notes](#notes)
   - [Demo](#demo)
+    - [Obtain Staking\&Rewards History](#obtain-stakingrewards-history)
+    - [Download Staking\&Rewards History(CSV)](#download-stakingrewards-historycsv)
     - [Notes](#notes-1)
   - [Usage](#usage)
     - [1. environment building](#1-environment-building)
     - [For Docker](#for-docker)
     - [For Local (Linux/Mac/Windows)](#for-local-linuxmacwindows)
       - [Note](#note)
-    - [\[Optional\] Development environment](#optional-development-environment)
+    - [Development Environment](#development-environment)
     - [2. Subscan API Settings](#2-subscan-api-settings)
       - [Supplementation](#supplementation)
     - [3. Application Execution](#3-application-execution)
@@ -25,15 +27,21 @@ Web app version of [dlSubscanStakingRewardsHistory](https://github.com/7rikazhex
       - [1. Usage Button](#1-usage-button)
       - [2. History Type Selection](#2-history-type-selection)
       - [3. Token Type Selection](#3-token-type-selection)
-      - [4. Sort Type Selection](#4-sort-type-selection)
-      - [5. Account Address Input](#5-account-address-input)
-      - [6. Input Number](#6-input-number)
-      - [7. Submit Button](#7-submit-button)
-      - [8. Response Data Info](#8-response-data-info)
-      - [9. Table](#9-table)
-      - [10. Error handling](#10-error-handling)
+      - [4. Staking Type Selection](#4-staking-type-selection)
+      - [5. Sort Type Selection](#5-sort-type-selection)
+      - [6. Account Address Input](#6-account-address-input)
+      - [7. Input Number](#7-input-number)
+      - [8. Submit Button](#8-submit-button)
+      - [9. Response Data Info](#9-response-data-info)
+      - [10. Table](#10-table)
+      - [11. Error handling](#11-error-handling)
   - [Other Information](#other-information)
     - [Cryptact Custom File](#cryptact-custom-file)
+    - [Donate](#donate)
+      - [DOT](#dot)
+      - [KSM](#ksm)
+      - [ASTR](#astr)
+      - [Manta](#manta)
 
 ## Summary
 
@@ -54,6 +62,7 @@ StakingRewards is obtained by specifying the following `Request URL` for each to
 | DOT   | V2 API      | reward-slash-v2 | Staking      | Reward   |
 | KSM   | V2 API      | reward-slash-v2 | Staking      | Reward   |
 | ASTR  | Staking API | reward-slash    | dappsstaking | Reward   |
+| MANTA  | Staking API | reward-slash    | parachainstaking | Reward   |
 
 </div>
 
@@ -62,9 +71,9 @@ StakingRewards is obtained by specifying the following `Request URL` for each to
 - While I have confirmed that I can verify incoming data for a particular account, I don't guarantee that you will necessarily get the expected data.
 - Please note that I'm not responsible for any and all damages incurred by executing or referring to this code.
 - The specifications of Subscan and the data format of Cryptact may change, so please check the latest information.
-- When using the application, please set SubscanAPI information from the settings screen described below.
+- When using the application, please set **SubscanAPI Key** information from the settings screen described below.
 - Transaction history depends on the transaction status. Please be sure to confirm that the data acquired is the desired data and that there are no errors by referring to the transaction data.
-- Only Polkadot, Kusama, and Astar are supported Networks.\
+- Only **Polkadot**, **Kusama**, **Astar** and **Manta** are supported Networks.\
   If other networks are specified, the data cannot be acquired correctly and an error will result.
   (reference:[API Endpoints](https://support.subscan.io/#api-endpoints))
 
@@ -72,7 +81,13 @@ StakingRewards is obtained by specifying the following `Request URL` for each to
 
 The Reward&Slash data displayed in the following demo uses [address](https://polkadot.subscan.io/reward?address=1REAJ1k691g5Eqqg9gL7vvZCBG7FCCZ8zgQkZWd4va5ESih&role=account) listed in Docs as of January 5, 2023.
 
-![Subscan_Download_StakingRewardsHistory_Demo.gif](.demofile/Subscan_Download_StakingRewardsHistory_Demo.gif)
+### Obtain Staking&Rewards History
+
+![dlSubscanStakingRewardsHistoryDash_demo1.gif](.demofile/dlSubscanStakingRewardsHistoryDash_demo1.gif)
+
+### Download Staking&Rewards History(CSV)
+
+![dlSubscanStakingRewardsHistoryDash_demo2.gif](.demofile/dlSubscanStakingRewardsHistoryDash_demo2.gif)
 
 ### Notes
 
@@ -118,7 +133,7 @@ If you use a development environment that supports static analysis tools, see \[
 
 1. Setup of virtual environment
 
-Run the poetry command.
+    Run the poetry command.
 
     ```bash
     poetry install --no-dev
@@ -129,13 +144,13 @@ Run the poetry command.
 - Please run `poetry env info` to check your development environment.
 - If your python version is not 3.10 or higher, please run `poetry env use python3.10` to recreate your development environment.
 
-Or create a virtual environment with venv, pyenv, etc. and run the following command.
+    Or create a virtual environment with venv, pyenv, etc. and run the following command.
 
     ```bash
     pip install -r requirements.txt
     ```
 
-### \[Optional\] Development environment
+### Development Environment
 
 The following static analysis tools are supported in the development environment
 
@@ -188,7 +203,7 @@ The following static analysis tools are supported in the development environment
 
 1. Application Launch
 
-Please access the URL displayed.
+    Please access the URL displayed.
 
     ```bash
     Dash is running on http://127.0.0.1:8050/
@@ -211,55 +226,63 @@ Please access the URL displayed.
 
 #### 2. History Type Selection
 
-- Select Reward&Slash or CryptactCustom.
-- Reward&Slash is selected by default.
+- Select `Reward&Slash` or `CryptactCustom`.
+- `Reward&Slash` is selected by default.
 
 #### 3. Token Type Selection
 
-- Select one of DOT, KSM, or ASTR.
-- DOT is selected by default.
+- Select one of `DOT`, `KSM`, `ASTR`, `MANTA`.
+- `DOT` is selected by default.
 
-#### 4. Sort Type Selection
+#### 4. Staking Type Selection
 
-- Select Ascending or Descending.
-- Ascending is selected by default.
+- Select `Nominator` or `NominationPool`.
+- `Nominator` is selected by default.
 
-#### 5. Account Address Input
+> [!NOTE]
+> **NominationPool supports only DOT and KSM.**  
+
+#### 5. Sort Type Selection
+
+- Select `Ascending` or `Descending`.
+- `Ascending` is selected by default.
+
+#### 6. Account Address Input
 
 - Please enter your account.
 - If it is not a legitimate account, a response error will result.
 - The address is linked to Token (radio button).
 - It is automatically entered by defining the `address_{tokken name}` key in the `[subscan_api_info]` selection in `config.toml`.
 
-#### 6. Input Number
+#### 7. Input Number
 
 - Enter the number to retrieve.
-- The default setting is in the range of 0 to 5000.
+- The default setting is in the range of `0` to `5000`.
 - If the range is exceeded, no input is allowed.
-- If you want to get more than 5000 entries, change the component_property(`max`) defined in the Input tag for `id='input_num'`.
-- The default is 50 entered.
+- If you want to get more than `5000` entries, change the component_property(`max`) defined in the Input tag for `id='input_num'`.
+- The default is `50` entered.
 
-#### 7. Submit Button
+#### 8. Submit Button
 
-- Clicking the Submit button will send a POST request based on the information entered in the Type, Token, Sort, and Account Address fields to retrieve the history.
+- Clicking the `Submit` button will send a POST request based on the information entered in the Type, Token, Sort, and Account Address fields to retrieve the history.
 
-#### 8. Response Data Info
+#### 9. Response Data Info
 
-- Response data (API Endpoint, HTTP Status Code, Data Num) is displayed when the Submit button is triggered.
+- Response data (API Endpoint, HTTP Status Code, Data Num) is displayed when the `Submit` button is triggered.
 - Data Num represents the number of cases retrieved, and if not met in Input, the maximum number of cases that can be retrieved is displayed.
 - If there is a problem with the response data during response processing, an error dialog appears and Response Data Info displays Error.
 - Default is "No Response Data" is displayed.
 
-#### 9. Table
+#### 10. Table
 
 - Displays response data in table format (`dash_table.DataTable`).
 - Select Table Data displays information about the selected cells. By default, "No Data Selection" is displayed.
-- The table displays 20 response data per page.
-- If the number of entries exceeds 20, they will be displayed on multiple pages.
+- The table displays `20` response data per page.
+- If the number of entries exceeds `20`, they will be displayed on multiple pages.
 - Pressing the CSV Download button saves the response data in csv format.
 - Changing pages deselects cells and changes "Response Data Info" and "Select Table Data" to default values.
 
-#### 10. Error handling
+#### 11. Error handling
 
 - If there is a problem with the response data during response processing, an error dialog will appear; pressing the OK button will close the error dialog and access the Subscan API Documents page. If the Cancel button is pressed, the document page is not accessed and the error dialog is closed.
 - When the error dialog is closed, "Response Data Info" will show Error and Select Table Data will change to the default value.
@@ -268,7 +291,7 @@ Please access the URL displayed.
 
 ### Cryptact Custom File
 
-Data is created according to the specifications in [カスタムファイルの作成方法 / 2.10.ステーキングによる報酬](https://support.cryptact.com/hc/ja/articles/360002571312-%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%AE%E4%BD%9C%E6%88%90%E6%96%B9%E6%B3%95-%E3%82%AB%E3%82%B9%E3%82%BF%E3%83%A0%E5%8F%96%E5%BC%95-#menu210).
+Data is created according to the specifications in ["Custom File for any other trades"](https://support.cryptact.com/hc/en-us/articles/360002571312-Custom-File-for-any-other-trades).
 
 - The data for the Cryptact custom file consists of a header and line data. The headers are stored in `[cryptact_info]` in "config.toml".
   `Cryptact_custom_header` value (list type) in "config.toml".
@@ -276,3 +299,37 @@ Data is created according to the specifications in [カスタムファイルの�
 - `block_timestamp` is converted to local time with `fromtimestamp()` because it is UNIX time as it is.
 - Date and time information is converted to string by specifying the format to match the Cryptact specification.
 - Since `amount` does not match the actual reward amount as it is, adjust the decimal point adjustment value (`[subscan_api_info]` `display_digit_dot/ksw/astr`) set in `config.toml` using the number of significant digits (`[subscan_ api_info]`,`adjust_value_dot/ksw/astr`) using the number of significant digits (`[subscan_info]`).
+
+### Donate
+
+This project was created as a personal hobby, but if you find this project useful, I hope you will consider making a donation to the address below. Your donation will motivate the continued development of this project.
+
+#### DOT
+
+```text
+14s8mQa7ZmFGqsaghB5DcgPtASH36vsM3aVEHCS6HAv5ExX5
+```
+
+#### KSM
+
+```text
+GSTHPevLLzj9zPcWEqGNUvjTQZdDJ8PRTbVWZihCt73oZi5
+```
+
+#### ASTR
+
+```text
+ZoS4NH8VDcudAc1DqULWBj1PrzWNr1wzHFtMcebbStWeVF8
+```
+
+#### Manta
+
+```text
+dfaR9auceLJjVSsM9dsfR9iG83XupnnG79M5S7zer8dL38ccM
+```
+
+Even a small contribution would be greatly appreciated. With heartfelt gratitude, I thank you.
+
+> [!NOTE]
+> Donations are not for profit but are intended to support the ongoing development and improvement of the project.
+> There are no perks or services offered in exchange for donations.

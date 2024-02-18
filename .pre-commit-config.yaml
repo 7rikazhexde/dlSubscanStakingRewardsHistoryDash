@@ -72,7 +72,7 @@ repos:
         name: black
         stages: [commit]
         language: system
-        entry: poetry run black app tests ci
+        entry: poetry run black app tests ci sample
         types: [python]
         exclude: resources_bin.py
 
@@ -87,7 +87,7 @@ repos:
         name: ruff
         stages: [commit]
         language: system
-        entry: poetry run ruff app tests ci --fix
+        entry: poetry run ruff app tests ci sample --fix
         types: [python]
 
     -   id: mypy

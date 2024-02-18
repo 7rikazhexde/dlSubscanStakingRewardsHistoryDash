@@ -44,6 +44,7 @@ RUN poetry install
 COPY ./app ./app
 COPY ./tests ./tests
 COPY ./ci ./ci
+COPY ./sample ./sample
 COPY README.md .
 
 # Run the application

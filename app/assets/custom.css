@@ -6,53 +6,60 @@
 
 /* elements with id='submit-usage' */
 #submit_usage {
-    color: rgb(50, 50, 50);
-    width: 100px;
-    padding: 5px;
-    font-size:20px;
     box-sizing: border-box;
-    margin-bottom: 10px;
-    border: 1px solid #68779a;
-    border-radius: 5px;
-    background: #cbe8fa;
-    cursor: pointer;
+    font-size:16px;
+    padding: 5px;
+    width: 100px;
 }
 
-/* elements with id='submit-usage' */
-#submit {
-    color: rgb(50, 50, 50);
-    height: 30px;
-    margin-left: 5px;
-    border: 1px solid #68779a;
-    border-radius: 2px;
-    background: #cbe8fa;
-    cursor: pointer;
+#submit_usage:hover {
+    background-color: #004ce4 !important;
+    color: #ffffff !important;
+}
+
+/* elements with id='submit-donate' */
+#submit_donate_info {
+    box-sizing: border-box;
+    font-size:16px;
+    padding: 5px;
+    width: 100px;
+}
+
+#submit_donate_info:hover {
+    background-color: #004ce4 !important;
+    color: #ffffff !important;
+}
+
+/* elements with id='submit' */
+#submit:hover {
+    background-color: #004ce4 !important;
+    color: #ffffff !important;
 }
 
 /* elements with id='export_table' */
 #export_table {
-    color: rgb(50, 50, 50);
-    width: 220px;
-    padding: 5px;
-    font-size:20px;
     box-sizing: border-box;
-    border: 1px solid #68779a;
-    border-radius: 5px;
-    background: #cbe8fa;
-    cursor: pointer;
+    font-size:16px;
+    padding: 5px;
+    width: 180px;
+}
+
+#export_table:hover {
+    background-color: #004ce4 !important;
+    color: #ffffff !important;
 }
 
 /* show_graph */
 /* Defined but not used */
 #show_graph {
-    color: rgb(252, 252, 252);
-    width: 220px;
-    padding: 5px;
-    font-size:20px;
     box-sizing: border-box;
-    margin-bottom: 10px;
+    background: #798bf1;
     border: 1px solid #9a9aff;
     border-radius: 5px;
-    background: #798bf1;
+    color: rgb(252, 252, 252);
     cursor: pointer;
+    font-size:20px;
+    margin-bottom: 10px;
+    padding: 5px;
+    width: 220px;
 }
