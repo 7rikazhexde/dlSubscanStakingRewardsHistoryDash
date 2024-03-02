@@ -25,16 +25,18 @@ Web app version of [dlSubscanStakingRewardsHistory](https://github.com/7rikazhex
     - [4. Application Operations](#4-application-operations)
       - [Notes](#notes-2)
       - [1. Usage Button](#1-usage-button)
-      - [2. History Type Selection](#2-history-type-selection)
-      - [3. Token Type Selection](#3-token-type-selection)
-      - [4. Staking Type Selection](#4-staking-type-selection)
-      - [5. Sort Type Selection](#5-sort-type-selection)
-      - [6. Account Address Input](#6-account-address-input)
-      - [7. Input Number](#7-input-number)
-      - [8. Submit Button](#8-submit-button)
-      - [9. Response Data Info](#9-response-data-info)
-      - [10. Table](#10-table)
-      - [11. Error handling](#11-error-handling)
+      - [2. Subscan Button](#2-subscan-button)
+      - [3. Donate Button](#3-donate-button)
+      - [4. History Type Selection](#4-history-type-selection)
+      - [5. Token Type Selection](#5-token-type-selection)
+      - [6. Staking Type Selection](#6-staking-type-selection)
+      - [7. Sort Type Selection](#7-sort-type-selection)
+      - [8. Account Address Input](#8-account-address-input)
+      - [9. Input Number](#9-input-number)
+      - [10. Submit Button](#10-submit-button)
+      - [11. Response Data Info](#11-response-data-info)
+      - [12. Table](#12-table)
+      - [13. Error handling](#13-error-handling)
   - [Other Information](#other-information)
     - [Cryptact Custom File](#cryptact-custom-file)
     - [Donate](#donate)
@@ -100,6 +102,9 @@ The Reward&Slash data displayed in the following demo uses [address](https://pol
 ### 1. environment building
 
 ### For Docker
+
+> [!CAUTION]
+> Currently, Unable to access web page after starting container with Docker([Detail](https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash/issues/5)).
 
 A container based on the service specified in `docker-compose.yaml` (the `app` service) is built, started, and the application is executed.
 
@@ -224,17 +229,25 @@ The following static analysis tools are supported in the development environment
 
 - Press the button to access this README.md.
 
-#### 2. History Type Selection
+#### 2. Subscan Button
+
+- Press the button to access Suscan Explorer on your address.
+
+#### 3. Donate Button
+
+- Press the button to access this [Donate](#donate) Info.
+
+#### 4. History Type Selection
 
 - Select `Reward&Slash` or `CryptactCustom`.
 - `Reward&Slash` is selected by default.
 
-#### 3. Token Type Selection
+#### 5. Token Type Selection
 
 - Select one of `DOT`, `KSM`, `ASTR`, `MANTA`.
 - `DOT` is selected by default.
 
-#### 4. Staking Type Selection
+#### 6. Staking Type Selection
 
 - Select `Nominator` or `NominationPool`.
 - `Nominator` is selected by default.
@@ -242,19 +255,19 @@ The following static analysis tools are supported in the development environment
 > [!NOTE]
 > **NominationPool supports only DOT and KSM.**  
 
-#### 5. Sort Type Selection
+#### 7. Sort Type Selection
 
 - Select `Ascending` or `Descending`.
 - `Ascending` is selected by default.
 
-#### 6. Account Address Input
+#### 8. Account Address Input
 
 - Please enter your account.
 - If it is not a legitimate account, a response error will result.
 - The address is linked to Token (radio button).
 - It is automatically entered by defining the `address_{tokken name}` key in the `[subscan_api_info]` selection in `config.toml`.
 
-#### 7. Input Number
+#### 9. Input Number
 
 - Enter the number to retrieve.
 - The default setting is in the range of `0` to `5000`.
@@ -262,18 +275,18 @@ The following static analysis tools are supported in the development environment
 - If you want to get more than `5000` entries, change the component_property(`max`) defined in the Input tag for `id='input_num'`.
 - The default is `50` entered.
 
-#### 8. Submit Button
+#### 10. Submit Button
 
 - Clicking the `Submit` button will send a POST request based on the information entered in the Type, Token, Sort, and Account Address fields to retrieve the history.
 
-#### 9. Response Data Info
+#### 11. Response Data Info
 
 - Response data (API Endpoint, HTTP Status Code, Data Num) is displayed when the `Submit` button is triggered.
 - Data Num represents the number of cases retrieved, and if not met in Input, the maximum number of cases that can be retrieved is displayed.
 - If there is a problem with the response data during response processing, an error dialog appears and Response Data Info displays Error.
 - Default is "No Response Data" is displayed.
 
-#### 10. Table
+#### 12. Table
 
 - Displays response data in table format (`dash_table.DataTable`).
 - Select Table Data displays information about the selected cells. By default, "No Data Selection" is displayed.
@@ -282,7 +295,7 @@ The following static analysis tools are supported in the development environment
 - Pressing the CSV Download button saves the response data in csv format.
 - Changing pages deselects cells and changes "Response Data Info" and "Select Table Data" to default values.
 
-#### 11. Error handling
+#### 13. Error handling
 
 - If there is a problem with the response data during response processing, an error dialog will appear; pressing the OK button will close the error dialog and access the Subscan API Documents page. If the Cancel button is pressed, the document page is not accessed and the error dialog is closed.
 - When the error dialog is closed, "Response Data Info" will show Error and Select Table Data will change to the default value.

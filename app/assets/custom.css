@@ -30,6 +30,19 @@
     color: #ffffff !important;
 }
 
+/* elements with id='submit_subscan_account_info'*/
+#submit_subscan_account_info {
+    box-sizing: border-box;
+    font-size:16px;
+    padding: 5px;
+    width: 100px;
+}
+
+#submit_subscan_account_info:hover {
+    background-color: #004ce4 !important;
+    color: #ffffff !important;
+}
+
 /* elements with id='submit' */
 #submit:hover {
     background-color: #004ce4 !important;

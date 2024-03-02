@@ -67,11 +67,23 @@ info_div = html.Div(
                 "background": "#cbe8fa",
                 "color": "rgb(50, 50, 50)",
                 "margin-left": "5px",
-                "margin-right": "5px",
                 "width": "100px",
             },
         ),
         html.Div(id="about_project_info", style={"display": "none"}),
+        dbc.Button(
+            "Subscan",
+            id="submit_subscan_account_info",
+            n_clicks=0,
+            size="sm",
+            style={
+                "background": "#cbe8fa",
+                "color": "rgb(50, 50, 50)",
+                "margin-left": "5px",
+                "width": "100px",
+            },
+        ),
+        html.Div(id="subscan_account_info", style={"display": "none"}),
         # html.Button("Donate", id="submit_donate_info", n_clicks=0),
         dbc.Button(
             "Donate",
@@ -81,6 +93,7 @@ info_div = html.Div(
             style={
                 "background": "#cbe8fa",
                 "color": "rgb(50, 50, 50)",
+                "margin-left": "5px",
                 "width": "100px",
             },
         ),
@@ -98,7 +111,7 @@ history_type_div = html.Div(
                 dcc.RadioItems(
                     id="radio_history_type",
                     options=history_type_list,
-                    value=history_type_list[0],
+                    value=history_type_list[1],
                     inline=True,
                     style={"margin-left": "5px"},
                     labelStyle={"margin-right": "2px"},
@@ -312,6 +325,7 @@ export_button = dbc.Button(
     style={
         "background": "#cbe8fa",
         "color": "rgb(50, 50, 50)",
+        "margin-top": "5px",
         "margin-left": "5px",
         "width": "180px",
     },
@@ -353,6 +367,14 @@ confirm_dialog = html.Div(
     ]
 )
 
+# Error Dialog for Subscan(ConfirmDialog)
+confirm_dialog_subscan = html.Div(
+    [
+        dcc.ConfirmDialog(id="confirm_error_dialog_subscan", message=""),
+        html.Div(id="confirm_dialog_subscan_div", style={"display": "none"}),
+    ]
+)
+
 # Application Layout Definition
 app.layout = html.Div(
     [
@@ -365,6 +387,7 @@ app.layout = html.Div(
         active_cell_info_div,
         table_div,
         confirm_dialog,
+        confirm_dialog_subscan,
     ]
 )
 
@@ -404,7 +427,69 @@ def open_url_about_project_info(n_clicks):
 
 # Callback function to Doate Div / children triggered by Doate Button / n_clicks
 # Summary:
-#  - Pressing the Usage button takes you to EADME.md on GitHub
+#  - Pressing the Subscan button takes you to Staking&Rewards on Subscan
+@app.callback(
+    Output("confirm_error_dialog_subscan", "displayed"),
+    Output("confirm_error_dialog_subscan", "message"),
+    Output("subscan_account_info", "children"),
+    Input("submit_subscan_account_info", "n_clicks"),
+    State("input_address", "value"),
+    State("drop_down_div", "value"),
+    State("stk_type", "value"),
+)
+def open_url_subscan_info(n_clicks, address, token, stk_type):
+    # variable initialization
+    is_error = False
+    text = None
+    confirm_dialog_flag = False
+
+    # Push Subscan Button
+    if n_clicks:
+        token_fn = get_token_full_name(token)
+        # Check StakingRewards Type Error
+        is_error, text = is_stkrwd_type_support_check(token, stk_type)
+        if is_error is True:
+            confirm_dialog_flag = True
+            message = text
+            config_manage.is_error = True
+            return (
+                confirm_dialog_flag,
+                message,
+                no_update,
+            )
+        if stk_type == "Nominator":
+            url = f"https://{token_fn}.subscan.io/reward?address={address}&role=account"
+        elif stk_type == "NominationPool":
+            url = f"https://{token_fn}.subscan.io/nomination_pool/paidout?address={address}"
+        # Open the Subscan URL
+        webbrowser.open(url)
+        message = text
+        return (
+            confirm_dialog_flag,
+            message,
+            no_update,
+        )
+    raise PreventUpdate
+
+
+def get_token_full_name(token):
+    match token:
+        case "DOT":
+            token_fn = "polkadot"
+        case "KSM":
+            token_fn = "kusama"
+        case "ASTR":
+            token_fn = "astar"
+        case "MANTA":
+            token_fn = "manta"
+        case _:
+            token_fn = ""
+    return token_fn
+
+
+# Callback function to Doate Div / children triggered by Doate Button / n_clicks
+# Summary:
+#  - Pressing the Usage button takes you to README.md on GitHub
 @app.callback(
     Output("donate_info", "children"), Input("submit_donate_info", "n_clicks")
 )
@@ -469,17 +554,17 @@ def update_active_cell_info(
 
 # Specify custom data attributes as component_property
 # https://community.plotly.com/t/moving-datatable-export-button-and-changing-text/39115/2
-app.clientside_callback(
-    """
-    function(n_clicks) {
-        if (n_clicks > 0)
-            document.querySelector('#data_table button.export').click()
-        return ''
-    }
-    """,
-    Output("export_table", "data-text"),
-    Input("export_table", "n_clicks"),
-)
+# app.clientside_callback(
+#    """
+#    function(n_clicks) {
+#        if (n_clicks > 0)
+#            document.querySelector('#data_table button.export').click()
+#        return ''
+#    }
+#    """,
+#    Output("export_table", "data-text"),
+#    Input("export_table", "n_clicks"),
+# )
 
 
 # Callback function to Input Address Div / value triggered by Radioitems / value
