@@ -1,3 +1,4 @@
+import datetime
 import webbrowser
 from typing import List
 
@@ -375,6 +376,13 @@ confirm_dialog_subscan = html.Div(
     ]
 )
 
+csv_div = html.Div(
+    [
+        dcc.Download(id="download_csv"),
+        html.Div(id="csv_div", style={"display": "none"}),
+    ]
+)
+
 # Application Layout Definition
 app.layout = html.Div(
     [
@@ -388,6 +396,7 @@ app.layout = html.Div(
         table_div,
         confirm_dialog,
         confirm_dialog_subscan,
+        csv_div,
     ]
 )
 
@@ -555,16 +564,46 @@ def update_active_cell_info(
 # Specify custom data attributes as component_property
 # https://community.plotly.com/t/moving-datatable-export-button-and-changing-text/39115/2
 # app.clientside_callback(
-#    """
-#    function(n_clicks) {
-#        if (n_clicks > 0)
-#            document.querySelector('#data_table button.export').click()
-#        return ''
-#    }
-#    """,
-#    Output("export_table", "data-text"),
-#    Input("export_table", "n_clicks"),
+#   """
+#   function(n_clicks) {
+#       if (n_clicks > 0)
+#           document.querySelector('#data_table button.export').click()
+#       return ''
+#   }
+#   """,
+#   Output('csv_div', 'children'),
+#   Input("export_table", "n_clicks"),
 # )
+
+
+@app.callback(
+    Output("download_csv", "data"),
+    Input("export_table", "n_clicks"),
+    State("radio_history_type", "value"),
+    State("stk_type", "value"),
+    prevent_initial_call=True,
+)
+def dl_csv(n_clicks, history_type, stk_type):
+    if n_clicks > 0:
+        df = df_manage.df_data
+        df = df.astype(str)
+
+        # pandas.DataFrame.to_csv method to output date in default format (YYYY-MM-DD HH:MM:SS)
+        # "CryptactCustom" format converts the data format and adds single quotes
+        if history_type == "CryptactCustom":
+            df["Timestamp"] = "'" + pd.to_datetime(df["Timestamp"]).dt.strftime(
+                "%Y/%m/%d %H:%M:%S"
+            )
+
+        d_today = datetime.date.today()
+
+        return dcc.send_data_frame(
+            df.to_csv,
+            f"{history_type}_{stk_type}_{d_today}.csv",
+            index=False,
+            header=True,
+            encoding="utf-8-sig",
+        )
 
 
 # Callback function to Input Address Div / value triggered by Radioitems / value
