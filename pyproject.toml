@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dlsubscanstakingrewardshistorydash"
-version = "0.2.8"
+version = "0.2.9"
 description = "Web app to retrieve staking reward history using Dash / Plotly and SubscanAPI."
 authors = ["7rikaz_h785 <7rikaz.h785.stat2ltas41lcijad@gmail.com>"]
 license = "MIT"
@@ -28,6 +28,7 @@ pytest-cov = "^4.0.0"
 pre-commit = "^3.3.3"
 taskipy = "^1.11.0"
 ruff = "^0.0.275"
+tk = "^0.1.0"
 
 [tool.taskipy.tasks]
 isort = "poetry run isort app tests"

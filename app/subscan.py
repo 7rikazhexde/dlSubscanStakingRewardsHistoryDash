@@ -1,6 +1,7 @@
 import json
 import math
 import time
+import traceback
 from datetime import datetime
 from decimal import ROUND_HALF_UP, Decimal
 
@@ -539,7 +540,9 @@ class SubscanStakingRewardDataProcess:
                     response_code = response_json["code"]
                 except Exception as e:
                     # ex)API rate limit exceeded
-                    print(e)
+                    print(
+                        f"Exception occurred at {traceback.extract_tb(e.__traceback__)[-1].filename}:{traceback.extract_tb(e.__traceback__)[-1].lineno}"
+                    )
                     break
 
                 try:
@@ -548,8 +551,10 @@ class SubscanStakingRewardDataProcess:
                         try:
                             list_num = len(response_json["data"]["list"])
                         except TypeError as e:
-                            print(e)
                             list_num = 0
+                            print(
+                                f"Changed list_num = {list_num} / TypeError occurred at {traceback.extract_tb(e.__traceback__)[-1].filename}:{traceback.extract_tb(e.__traceback__)[-1].lineno}"
+                            )
                 except TypeError:
                     count = response_json["data"]["count"]
                     print(
@@ -637,8 +642,10 @@ class SubscanStakingRewardDataProcess:
                 try:
                     list_num = len(response_json["data"]["list"])
                 except TypeError as e:
-                    print(e)
                     list_num = 0
+                    print(
+                        f"Changed list_num = {list_num} / TypeError occurred at {traceback.extract_tb(e.__traceback__)[-1].filename}:{traceback.extract_tb(e.__traceback__)[-1].lineno}"
+                    )
 
             # If there are no errors in Response and the list exists, incoming data is created.
             if response_status_code == 200 and response_code == 0 and list_num != 0:
@@ -804,7 +811,9 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                     response_code = response_json["code"]
                 except Exception as e:
                     # ex)API rate limit exceeded
-                    print(e)
+                    print(
+                        f"Exception occurred at {traceback.extract_tb(e.__traceback__)[-1].filename}:{traceback.extract_tb(e.__traceback__)[-1].lineno}"
+                    )
                     break
                 try:
                     # Get the number of elements in the list if the address is not invalid.
@@ -812,8 +821,10 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                         try:
                             list_num = len(response_json["data"]["list"])
                         except TypeError as e:
-                            print(e)
                             list_num = 0
+                            print(
+                                f"Changed list_num = {list_num} / TypeError occurred at {traceback.extract_tb(e.__traceback__)[-1].filename}:{traceback.extract_tb(e.__traceback__)[-1].lineno}"
+                            )
                 except TypeError:
                     count = response_json["data"]["count"]
                     print(
@@ -893,8 +904,10 @@ class SubscanStakingRewardsDataProcessForCryptact(SubscanStakingRewardDataProces
                 try:
                     list_num = len(response_json["data"]["list"])
                 except TypeError as e:
-                    print(e)
                     list_num = 0
+                    print(
+                        f"Changed list_num = {list_num} / TypeError occurred at {traceback.extract_tb(e.__traceback__)[-1].filename}:{traceback.extract_tb(e.__traceback__)[-1].lineno}"
+                    )
 
             # Get the number of elements in the list if the address is not invalid.
             if response_status_code == 200 and response_code == 0 and list_num != 0:

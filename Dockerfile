@@ -1,5 +1,5 @@
 # Specify the base Docker image
-FROM python:3.10
+FROM python:3
 
 # Set the working directory
 WORKDIR /
@@ -19,12 +19,12 @@ ENV TZ JST-9
 ENV TERM xterm
 
 # Install Poetry
-## https://python-poetry.org/docs/#installing-with-the-official-installer
+## Ref: https://python-poetry.org/docs/#installing-with-the-official-installer
 ### Linux, macOS, Windows (WSL)
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # Set the path of Poetry with unix
-## https://python-poetry.org/docs/#installing-with-the-official-installer
+## Ref: https://python-poetry.org/docs/#installing-with-the-official-installer
 ### Add Poetry to your PATH
 ENV PATH /root/.local/bin:$PATH
 
@@ -38,6 +38,8 @@ WORKDIR /dlSubscanStakingRewardsHistoryDash
 COPY pyproject.toml poetry.lock ./
 
 # Install dependencies
+## Ref: https://python-poetry.org/docs/main/faq/#my-requests-are-timing-out
+ENV POETRY_HTTP_TIMEOUT=600
 RUN poetry install
 
 # Copy the application files

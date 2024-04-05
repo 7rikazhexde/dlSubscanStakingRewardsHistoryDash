@@ -1,4 +1,5 @@
 import datetime
+import os
 import webbrowser
 from typing import List
 
@@ -112,7 +113,7 @@ history_type_div = html.Div(
                 dcc.RadioItems(
                     id="radio_history_type",
                     options=history_type_list,
-                    value=history_type_list[1],
+                    value=history_type_list[0],
                     inline=True,
                     style={"margin-left": "5px"},
                     labelStyle={"margin-right": "2px"},
@@ -383,11 +384,29 @@ csv_div = html.Div(
     ]
 )
 
+usage_url_div = html.Div(
+    id="usage_url_div",
+    style={"display": "none", "margin-bottom": "10px"},
+)
+
+subscan_url_div = html.Div(
+    id="subscan_url_div",
+    style={"display": "none", "margin-bottom": "10px"},
+)
+
+donate_url_div = html.Div(
+    id="donate_url_div",
+    style={"display": "none", "margin-bottom": "10px"},
+)
+
 # Application Layout Definition
 app.layout = html.Div(
     [
         title_div,
         info_div,
+        usage_url_div,
+        subscan_url_div,
+        donate_url_div,
         history_type_div,
         token_sort_div,
         address_input_div,
@@ -418,29 +437,59 @@ def check_confirm_dialog(submit_n_clicks):
     raise PreventUpdate
 
 
+def is_docker():
+    path = "/proc/self/cgroup"
+    return (
+        os.path.exists("/.dockerenv")
+        or os.path.isfile(path)
+        and any("docker" in line for line in open(path))
+    )
+
+
 # Callback function to Usage Div / children triggered by Usage Button / n_clicks
 # Summary:
 #  - Pressing the Usage button takes you to EADME.md on GitHub
+#  - If it is in the Docker, use dcc.Link to display a clickable link.
 @app.callback(
-    Output("about_project_info", "children"), Input("submit_usage", "n_clicks")
+    Output("about_project_info", "children"),
+    Output("usage_url_div", "children"),
+    Output("usage_url_div", "style"),
+    Input("submit_usage", "n_clicks"),
 )
 def open_url_about_project_info(n_clicks):
     if n_clicks:
         # Open the GitHub README.md
-        webbrowser.open(
-            "https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash#readme"
-        )
-        return no_update
+        url = "https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash#readme"
+        if not is_docker():
+            webbrowser.open(url)
+            return no_update, no_update, {"display": "none"}
+        else:
+            usage_url_div_children = html.Div(
+                [
+                    html.Div(
+                        "Please click the following Usage URL to open in your browser:",
+                        style={"font-weight": "bold", "margin-left": "5px"},
+                    ),
+                    dcc.Link(
+                        url, href=url, target="_blank", style={"margin-left": "5px"}
+                    ),
+                ]
+            )
+            usage_url_div_style = {"display": "block", "margin-bottom": "10px"}
+            return no_update, usage_url_div_children, usage_url_div_style
     raise PreventUpdate
 
 
 # Callback function to Doate Div / children triggered by Doate Button / n_clicks
 # Summary:
-#  - Pressing the Subscan button takes you to Staking&Rewards on Subscan
+#  - Pressing the Subscan button takes you to Staking&Rewards on Subscan.
+#  - If it is in the Docker, use dcc.Link to display a clickable link.
 @app.callback(
     Output("confirm_error_dialog_subscan", "displayed"),
     Output("confirm_error_dialog_subscan", "message"),
     Output("subscan_account_info", "children"),
+    Output("subscan_url_div", "children"),
+    Output("subscan_url_div", "style"),
     Input("submit_subscan_account_info", "n_clicks"),
     State("input_address", "value"),
     State("drop_down_div", "value"),
@@ -451,6 +500,7 @@ def open_url_subscan_info(n_clicks, address, token, stk_type):
     is_error = False
     text = None
     confirm_dialog_flag = False
+    subscan_url_div_style = {"display": "none"}
 
     # Push Subscan Button
     if n_clicks:
@@ -461,23 +511,56 @@ def open_url_subscan_info(n_clicks, address, token, stk_type):
             confirm_dialog_flag = True
             message = text
             config_manage.is_error = True
+            subscan_url_div_style = {"display": "none"}
             return (
                 confirm_dialog_flag,
                 message,
                 no_update,
+                no_update,
+                subscan_url_div_style,
             )
+        elif address == "":
+            confirm_dialog_flag = True
+            message = "Please input address"
+            config_manage.is_error = True
+            subscan_url_div_style = {"display": "none"}
+            return (
+                confirm_dialog_flag,
+                message,
+                no_update,
+                no_update,
+                subscan_url_div_style,
+            )
+
         if stk_type == "Nominator":
             url = f"https://{token_fn}.subscan.io/reward?address={address}&role=account"
         elif stk_type == "NominationPool":
             url = f"https://{token_fn}.subscan.io/nomination_pool/paidout?address={address}"
-        # Open the Subscan URL
-        webbrowser.open(url)
-        message = text
-        return (
-            confirm_dialog_flag,
-            message,
-            no_update,
-        )
+
+        if not is_docker():
+            webbrowser.open(url)
+            return no_update, no_update, no_update, no_update, {"display": "none"}
+        else:
+            # Display the URL as a link in subscan_url_div
+            subscan_url_div_children = html.Div(
+                [
+                    html.Div(
+                        "Please click the following Subscan URL to open in your browser:",
+                        style={"font-weight": "bold", "margin-left": "5px"},
+                    ),
+                    dcc.Link(
+                        url, href=url, target="_blank", style={"margin-left": "5px"}
+                    ),
+                ]
+            )
+            subscan_url_div_style = {"display": "block", "margin-bottom": "10px"}
+            return (
+                no_update,
+                no_update,
+                no_update,
+                subscan_url_div_children,
+                subscan_url_div_style,
+            )
     raise PreventUpdate
 
 
@@ -500,15 +583,32 @@ def get_token_full_name(token):
 # Summary:
 #  - Pressing the Usage button takes you to README.md on GitHub
 @app.callback(
-    Output("donate_info", "children"), Input("submit_donate_info", "n_clicks")
+    Output("donate_info", "children"),
+    Output("donate_url_div", "children"),
+    Output("donate_url_div", "style"),
+    Input("submit_donate_info", "n_clicks"),
 )
 def open_url_donate_info(n_clicks):
     if n_clicks:
         # Open the GitHub README.md
-        webbrowser.open(
-            "https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash?tab=readme-ov-file#donate"
-        )
-        return no_update
+        url = "https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash?tab=readme-ov-file#donate"
+        if not is_docker():
+            webbrowser.open(url)
+            return no_update, no_update, {"display": "none"}
+        else:
+            donate_url_div_children = html.Div(
+                [
+                    html.Div(
+                        "Please click the following Donate URL to open in your browser:",
+                        style={"font-weight": "bold", "margin-left": "5px"},
+                    ),
+                    dcc.Link(
+                        url, href=url, target="_blank", style={"margin-left": "5px"}
+                    ),
+                ]
+            )
+            donate_url_div_style = {"display": "block", "margin-bottom": "10px"}
+            return no_update, donate_url_div_children, donate_url_div_style
     raise PreventUpdate
 
 
@@ -580,10 +680,12 @@ def update_active_cell_info(
     Output("download_csv", "data"),
     Input("export_table", "n_clicks"),
     State("radio_history_type", "value"),
+    State("drop_down_div", "value"),
+    State("input_num", "value"),
     State("stk_type", "value"),
     prevent_initial_call=True,
 )
-def dl_csv(n_clicks, history_type, stk_type):
+def dl_csv(n_clicks, history_type, token, num, stk_type):
     if n_clicks > 0:
         df = df_manage.df_data
         df = df.astype(str)
@@ -599,7 +701,7 @@ def dl_csv(n_clicks, history_type, stk_type):
 
         return dcc.send_data_frame(
             df.to_csv,
-            f"{history_type}_{stk_type}_{d_today}.csv",
+            f"{token}_{history_type}_{stk_type}_N={num}_{d_today}.csv",
             index=False,
             header=True,
             encoding="utf-8-sig",
@@ -696,8 +798,8 @@ def get_subscan_stkrwd(
             response_code,
             api_endpoint,
             response_status_code,
-            header_list,
-            response_data_list,
+            _,
+            _,
             df,
             list_num,
         ) = stkrwd.get_subscan_stakerewards()
@@ -715,8 +817,8 @@ def get_subscan_stkrwd(
             response_code,
             api_endpoint,
             response_status_code,
-            header_list,
-            response_data_list,
+            _,
+            _,
             df,
             list_num,
         ) = cyrptactcustom.create_stakerewards_cryptact_cutom_df()
@@ -823,6 +925,11 @@ def is_stkrwd_type_support_check(token, stk_type):
 def is_error_check(response_code, response_status_code, list_num):
     result = False
     text = ""
+    open_url_text1 = ""
+    open_url_text2 = ""
+    if not is_docker():
+        open_url_text1 = "Click OK button to go to the Subscan API Documents page.\n"
+        open_url_text2 = f"Open URL?({config_manage.subscan_api_doc})\n"
     # Response data error judgment processing
     # code error (other than success)
     if response_code != 0:
@@ -830,8 +937,8 @@ def is_error_check(response_code, response_status_code, list_num):
             f"HTTP Status Codes: {response_code}\n"
             "Error Details: Invalid Account Address.\n"
             "Please Check Account Address.\n\n"
-            "Click OK button to go to the Subscan API Documents page.\n"
-            f"Open URL?({config_manage.subscan_api_doc})\n"
+            f"{open_url_text1}"
+            f"{open_url_text2}"
         )
         result = True
     # HTTP Status Codes Error
@@ -839,8 +946,8 @@ def is_error_check(response_code, response_status_code, list_num):
         text = (
             f"HTTP Status Codes: {response_status_code}\n"
             "Please Check Subscan API Documents.\n\n"
-            "Click OK button to go to the Subscan API Documents page.\n"
-            f"Open URL?({config_manage.subscan_api_doc})\n"
+            f"{open_url_text1}"
+            f"{open_url_text2}"
         )
         result = True
     # Error when no data received
@@ -848,8 +955,8 @@ def is_error_check(response_code, response_status_code, list_num):
         text = (
             "Response data could not be retrieved.\n"
             "Please Check Account Address or Response data.\n\n"
-            "Click OK button to go to the Subscan API Documents page.\n"
-            f"Open URL?({config_manage.subscan_api_doc})\n"
+            f"{open_url_text1}"
+            f"{open_url_text2}"
         )
         result = True
     return result, text
@@ -984,7 +1091,7 @@ def display_graph(children, token, history_type, stk_type, sort_type):
 
 if __name__ == "__main__":
     # To allow access from other computers on the local network
-    # app.run(debug=True, host="0.0.0.0", port=8050)
+    app.run(debug=False, host="0.0.0.0", port=8050)
     # To allow access only from your own computer
     # If you want to use the Dash Dev Tools, set dev_tools_ui=True.
-    app.run(debug=True, dev_tools_ui=False)
+    # app.run(debug=True, dev_tools_ui=False)
