@@ -124,6 +124,12 @@ A container based on the service specified in `docker-compose.yaml` (the `app` s
     docker-compose start
     ```
 
+    or
+
+    ```bash
+    docker run --rm -p 8050:8050 dlsubscanstakingrewardshistorydash-app poetry run python app
+    ```
+
 ### For Local (Linux/Mac/Windows)
 
 #### Note
@@ -211,7 +217,7 @@ The following static analysis tools are supported in the development environment
     Please access the URL displayed.
 
     ```bash
-    Dash is running on http://127.0.0.1:8050/
+    Dash is running on http://0.0.0.0:8050/
 
      * Serving Flask app 'main'
      * Debug mode: on
