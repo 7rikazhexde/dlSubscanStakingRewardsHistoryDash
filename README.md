@@ -27,16 +27,17 @@ Web app version of [dlSubscanStakingRewardsHistory](https://github.com/7rikazhex
       - [1. Usage Button](#1-usage-button)
       - [2. Subscan Button](#2-subscan-button)
       - [3. Donate Button](#3-donate-button)
-      - [4. History Type Selection](#4-history-type-selection)
-      - [5. Token Type Selection](#5-token-type-selection)
-      - [6. Staking Type Selection](#6-staking-type-selection)
-      - [7. Sort Type Selection](#7-sort-type-selection)
-      - [8. Account Address Input](#8-account-address-input)
-      - [9. Input Number](#9-input-number)
-      - [10. Submit Button](#10-submit-button)
-      - [11. Response Data Info](#11-response-data-info)
-      - [12. Table](#12-table)
-      - [13. Error handling](#13-error-handling)
+      - [4. Set API Key](#4-set-api-key)
+      - [5. History Type Selection](#5-history-type-selection)
+      - [6. Token Type Selection](#6-token-type-selection)
+      - [7. Staking Type Selection](#7-staking-type-selection)
+      - [8. Sort Type Selection](#8-sort-type-selection)
+      - [9. Account Address Input](#9-account-address-input)
+      - [10. Input Number](#10-input-number)
+      - [11. Submit Button](#11-submit-button)
+      - [12. Response Data Info](#12-response-data-info)
+      - [13. Table](#13-table)
+      - [14. Error handling](#14-error-handling)
   - [Other Information](#other-information)
     - [Cryptact Custom File](#cryptact-custom-file)
     - [Donate](#donate)
@@ -102,9 +103,6 @@ The Reward&Slash data displayed in the following demo uses [address](https://pol
 ### 1. environment building
 
 ### For Docker
-
-> [!CAUTION]
-> Currently, Unable to access web page after starting container with Docker([Detail](https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash/issues/5)).
 
 A container based on the service specified in `docker-compose.yaml` (the `app` service) is built, started, and the application is executed.
 
@@ -193,7 +191,8 @@ The following static analysis tools are supported in the development environment
 ### 2. Subscan API Settings
 
 - Set the section marked "(User-defined required)" in `app/config.toml` before starting the application.
-- Be sure to set the API key, address, decimal point adjustment value, and number of significant digits.
+- Be sure to set the API key, address, decimal point adjustment value, and round decimals value.
+- The API key and address can be changed even after the application is launched.
 - Each setting value will be displayed in conjunction with the token information set on the page from which you first accessed the URL. (See below for "Application Operations").
 - Please note that if the values are changed, the system will not operate normally.
 
@@ -243,17 +242,21 @@ The following static analysis tools are supported in the development environment
 
 - Press the button to access this [Donate](#donate) Info.
 
-#### 4. History Type Selection
+#### 4. Set API Key
+
+- Enter the API Key and press the Set button to save the API Key in `app/config.toml`.
+
+#### 5. History Type Selection
 
 - Select `Reward&Slash` or `CryptactCustom`.
 - `Reward&Slash` is selected by default.
 
-#### 5. Token Type Selection
+#### 6. Token Type Selection
 
 - Select one of `DOT`, `KSM`, `ASTR`, `MANTA`.
 - `DOT` is selected by default.
 
-#### 6. Staking Type Selection
+#### 7. Staking Type Selection
 
 - Select `Nominator` or `NominationPool`.
 - `Nominator` is selected by default.
@@ -261,19 +264,20 @@ The following static analysis tools are supported in the development environment
 > [!NOTE]
 > **NominationPool supports only DOT and KSM.**  
 
-#### 7. Sort Type Selection
+#### 8. Sort Type Selection
 
 - Select `Ascending` or `Descending`.
 - `Ascending` is selected by default.
 
-#### 8. Account Address Input
+#### 9. Account Address Input
 
 - Please enter your account.
 - If it is not a legitimate account, a response error will result.
 - The address is linked to Token (radio button).
-- It is automatically entered by defining the `address_{tokken name}` key in the `[subscan_api_info]` selection in `config.toml`.
+- It is automatically entered by defining the `address_{tokken name}` key in the `[subscan_api_info]` selection in `app/config.toml`.
+- Enter the address and press the Set button to save the address in `app/config.toml`.
 
-#### 9. Input Number
+#### 10. Input Number
 
 - Enter the number to retrieve.
 - The default setting is in the range of `0` to `5000`.
@@ -281,18 +285,18 @@ The following static analysis tools are supported in the development environment
 - If you want to get more than `5000` entries, change the component_property(`max`) defined in the Input tag for `id='input_num'`.
 - The default is `50` entered.
 
-#### 10. Submit Button
+#### 11. Submit Button
 
 - Clicking the `Submit` button will send a POST request based on the information entered in the Type, Token, Sort, and Account Address fields to retrieve the history.
 
-#### 11. Response Data Info
+#### 12. Response Data Info
 
 - Response data (API Endpoint, HTTP Status Code, Data Num) is displayed when the `Submit` button is triggered.
 - Data Num represents the number of cases retrieved, and if not met in Input, the maximum number of cases that can be retrieved is displayed.
 - If there is a problem with the response data during response processing, an error dialog appears and Response Data Info displays Error.
 - Default is "No Response Data" is displayed.
 
-#### 12. Table
+#### 13. Table
 
 - Displays response data in table format (`dash_table.DataTable`).
 - Select Table Data displays information about the selected cells. By default, "No Data Selection" is displayed.
@@ -301,7 +305,7 @@ The following static analysis tools are supported in the development environment
 - Pressing the CSV Download button saves the response data in csv format.
 - Changing pages deselects cells and changes "Response Data Info" and "Select Table Data" to default values.
 
-#### 13. Error handling
+#### 14. Error handling
 
 - If there is a problem with the response data during response processing, an error dialog will appear; pressing the OK button will close the error dialog and access the Subscan API Documents page. If the Cancel button is pressed, the document page is not accessed and the error dialog is closed.
 - When the error dialog is closed, "Response Data Info" will show Error and Select Table Data will change to the default value.
@@ -312,12 +316,11 @@ The following static analysis tools are supported in the development environment
 
 Data is created according to the specifications in ["Custom File for any other trades"](https://support.cryptact.com/hc/en-us/articles/360002571312-Custom-File-for-any-other-trades).
 
-- The data for the Cryptact custom file consists of a header and line data. The headers are stored in `[cryptact_info]` in "config.toml".
-  `Cryptact_custom_header` value (list type) in "config.toml".
+- The data for the Cryptact custom file consists of a header and line data. The headers are stored in `[cryptact_info]` in `app/config.toml`.
+  `Cryptact_custom_header` value (list type) in `app/config.toml`.
 - Row data is created from a list of variable values (`block_timestamp`,`amount`,`event_index`) and `fixed values` (`[cryptact_info]`).
 - `block_timestamp` is converted to local time with `fromtimestamp()` because it is UNIX time as it is.
 - Date and time information is converted to string by specifying the format to match the Cryptact specification.
-- Since `amount` does not match the actual reward amount as it is, adjust the decimal point adjustment value (`[subscan_api_info]` `display_digit_dot/ksw/astr`) set in `config.toml` using the number of significant digits (`[subscan_ api_info]`,`adjust_value_dot/ksw/astr`) using the number of significant digits (`[subscan_info]`).
 
 ### Donate
 

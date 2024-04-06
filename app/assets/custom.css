@@ -43,6 +43,18 @@
     color: #ffffff !important;
 }
 
+/* elements with id='submit_api_key' */
+#submit_api_key:hover {
+    background-color: #004ce4 !important;
+    color: #ffffff !important;
+}
+
+/* elements with id='set_account_address' */
+#set_account_address:hover {
+    background-color: #004ce4 !important;
+    color: #ffffff !important;
+}
+
 /* elements with id='submit' */
 #submit:hover {
     background-color: #004ce4 !important;

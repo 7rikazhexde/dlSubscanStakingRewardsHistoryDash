@@ -7,7 +7,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.graph_objects as go
 from config_manage import ConfigManage
-from dash import Dash, Input, Output, State, dash_table, dcc, html
+from dash import Dash, Input, Output, State, ctx, dash_table, dcc, html
 from dash.dash import no_update
 from dash.exceptions import PreventUpdate
 from dcc_manage import DccManage
@@ -104,6 +104,43 @@ info_div = html.Div(
     style={"display": "inline-flex", "margin-bottom": "5px"},
 )
 
+
+# API key(Input & Button)
+api_key_input_div = html.Div(
+    [
+        html.Div("API Key:", style={"font-weight": "bold", "margin-left": "5px"}),
+        dcc.Input(
+            id="input_api_key",
+            type="password",
+            placeholder="Enter your API key",
+            value=config_manage.api_key_info,
+            debounce=True,
+            style={"margin-left": "5px", "width": "250px"},
+        ),
+        dbc.Button(
+            "Set",
+            id="submit_api_key",
+            n_clicks=0,
+            className="mr-2",
+            size="sm",
+            style={
+                "background": "#cbe8fa",
+                "color": "rgb(50, 50, 50)",
+                "margin-left": "5px",
+                "width": "60px",
+            },
+        ),
+        html.Div(id="api_key_status", style={"margin-left": "5px"}),
+    ],
+    style={
+        "display": "flex",
+        "align-items": "center",
+        "margin-bottom": "10px",
+        "margin-top": "5px",
+    },
+)
+
+
 # History type(RadioItems)
 history_type_div = html.Div(
     [
@@ -183,11 +220,25 @@ address_input_div = html.Div(
         dcc.Input(
             id="input_address",
             type="text",
-            placeholder="",
-            value=config_manage.get_subscan_api_info_address(token_data_list[0]),
+            placeholder="Enter your acount address",
+            value=config_manage.get_token_address_info(token_data_list[0]),
             size="58",
-            style={"margin-left": "5px", "height": "25px"},
+            style={"margin-left": "5px"},
         ),
+        dbc.Button(
+            "Set",
+            id="set_account_address",
+            n_clicks=0,
+            className="mr-2",
+            size="sm",
+            style={
+                "background": "#cbe8fa",
+                "color": "rgb(50, 50, 50)",
+                "margin-left": "5px",
+                "width": "60px",
+            },
+        ),
+        html.Div(id="account_address_status", style={"margin-left": "5px"}),
         html.Div("Input:", style={"font-weight": "bold", "margin-left": "5px"}),
         dcc.Input(
             id="input_num",
@@ -196,7 +247,7 @@ address_input_div = html.Div(
             min=1,
             max=5000,
             step=1,
-            style={"margin-left": "5px", "height": "25px"},
+            style={"margin-left": "5px"},
         ),
         # html.Button(
         #    "Submit",
@@ -407,6 +458,7 @@ app.layout = html.Div(
         usage_url_div,
         subscan_url_div,
         donate_url_div,
+        api_key_input_div,
         history_type_div,
         token_sort_div,
         address_input_div,
@@ -418,6 +470,40 @@ app.layout = html.Div(
         csv_div,
     ]
 )
+
+
+# Callbacks Definition
+# Summary:
+#  - Callback function to display API key status and update API key
+#  - Update the value by pressing the Set button
+#  - If the value is empty, it is updated with "".
+@app.callback(
+    Output("api_key_status", "children"),
+    Output("input_api_key", "value"),
+    Input("submit_api_key", "n_clicks"),
+    State("input_api_key", "value"),
+)
+def update_api_key(n_clicks, api_key):
+    if not ctx.triggered:
+        # When loading application
+        api_key = config_manage.api_key_info
+        if api_key:
+            # return "API key is set", api_key
+            return "", api_key
+        else:
+            # return "API key is not set", ""
+            return "", ""
+    else:
+        # When the Set button is clicked
+        button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+        if button_id == "submit_api_key" and n_clicks:
+            config_manage.api_key_info = api_key
+            if api_key:
+                return "", api_key
+            else:
+                return "", ""
+        else:
+            raise PreventUpdate
 
 
 # Callbacks Definition
@@ -716,10 +802,30 @@ def dl_csv(n_clicks, history_type, token, num, stk_type):
     Output("input_address", "value"),
     Input("drop_down_div", "value"),
 )
-def update_selecter(token):
+def load_address(token):
     # Get Subscan API Info
-    address = config_manage.get_subscan_api_info_address(token)
+    address = config_manage.get_token_address_info(token)
     return address
+
+
+# Callback function to Input Address Div / value triggered by Radioitems / value
+# Summary:
+#  - Update the address for each token defined in app/config.toml
+#  - Update the value by pressing the Set button
+#  - If the value is empty, it is updated with "".
+@app.callback(
+    Output("account_address_status", "children"),
+    Input("set_account_address", "n_clicks"),
+    State("drop_down_div", "value"),
+    State("input_address", "value"),
+)
+def update_address(n_clicks, token, input_address):
+    button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    if button_id == "set_account_address" and n_clicks:
+        config_manage.set_token_address_info(token, input_address)
+        return no_update
+    else:
+        raise PreventUpdate
 
 
 # Callback function to dash_table.DataTable and confirm_error_dialog  triggered by Submit Botton / n_clicks
