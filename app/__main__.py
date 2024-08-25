@@ -1,6 +1,4 @@
 import datetime
-import os
-import webbrowser
 from typing import List
 
 import dash_bootstrap_components as dbc
@@ -52,6 +50,15 @@ df_manage = DfManage()
 title_div = html.H3(
     "Download Subscan Staking&Rewards / Cryptact Custom",
     style={"margin-left": "5px", "margin-bottom": "10px", "margin-top": "5px"},
+)
+
+url_access_div = html.Div(
+    [
+        html.Div(id="hidden-div-for-usage-callback"),
+        html.Div(id="hidden-div-for-subscan-callback"),
+        html.Div(id="hidden-div-for-donate-callback"),
+        html.Div(id="hidden-div-for-error-callback"),
+    ]
 )
 
 # Usage(Button)
@@ -435,29 +442,12 @@ csv_div = html.Div(
     ]
 )
 
-usage_url_div = html.Div(
-    id="usage_url_div",
-    style={"display": "none", "margin-bottom": "10px"},
-)
-
-subscan_url_div = html.Div(
-    id="subscan_url_div",
-    style={"display": "none", "margin-bottom": "10px"},
-)
-
-donate_url_div = html.Div(
-    id="donate_url_div",
-    style={"display": "none", "margin-bottom": "10px"},
-)
-
 # Application Layout Definition
 app.layout = html.Div(
     [
         title_div,
         info_div,
-        usage_url_div,
-        subscan_url_div,
-        donate_url_div,
+        url_access_div,
         api_key_input_div,
         history_type_div,
         token_sort_div,
@@ -506,6 +496,23 @@ def update_api_key(n_clicks, api_key):
             raise PreventUpdate
 
 
+# Erroehandling用のクライアントサイドコールバック
+app.clientside_callback(
+    """
+    function(submit_n_clicks, is_error) {
+        if (submit_n_clicks && !is_error) {
+            window.open("https://support.subscan.io/#http-status-codes", "_blank");
+        }
+        return null;
+    }
+    """,
+    Output("hidden-div-for-error-callback", "children"),
+    Input("confirm_error_dialog", "submit_n_clicks"),
+    State("confirm_error_dialog", "displayed"),
+    prevent_initial_call=True,
+)
+
+
 # Callbacks Definition
 # Summary:
 #  - Callback function to Div / children triggered by ConfirmDialog / submit_n_clicks
@@ -517,19 +524,24 @@ def update_api_key(n_clicks, api_key):
 )
 def check_confirm_dialog(submit_n_clicks):
     if submit_n_clicks and config_manage.is_error is False:
-        # Open the Subscan API Document
-        webbrowser.open("https://support.subscan.io/#http-status-codes")
         return no_update
     raise PreventUpdate
 
 
-def is_docker():
-    path = "/proc/self/cgroup"
-    return (
-        os.path.exists("/.dockerenv")
-        or os.path.isfile(path)
-        and any("docker" in line for line in open(path))
-    )
+# Usage ボタン用のクライアントサイドコールバック
+app.clientside_callback(
+    """
+    function(n_clicks) {
+        if (n_clicks > 0) {
+            window.open("https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash#readme", "_blank");
+        }
+        return null;
+    }
+    """,
+    Output("hidden-div-for-usage-callback", "children"),
+    Input("submit_usage", "n_clicks"),
+    prevent_initial_call=True,
+)
 
 
 # Callback function to Usage Div / children triggered by Usage Button / n_clicks
@@ -538,32 +550,47 @@ def is_docker():
 #  - If it is in the Docker, use dcc.Link to display a clickable link.
 @app.callback(
     Output("about_project_info", "children"),
-    Output("usage_url_div", "children"),
-    Output("usage_url_div", "style"),
     Input("submit_usage", "n_clicks"),
 )
 def open_url_about_project_info(n_clicks):
     if n_clicks:
-        # Open the GitHub README.md
-        url = "https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash#readme"
-        if not is_docker():
-            webbrowser.open(url)
-            return no_update, no_update, {"display": "none"}
-        else:
-            usage_url_div_children = html.Div(
-                [
-                    html.Div(
-                        "Please click the following Usage URL to open in your browser:",
-                        style={"font-weight": "bold", "margin-left": "5px"},
-                    ),
-                    dcc.Link(
-                        url, href=url, target="_blank", style={"margin-left": "5px"}
-                    ),
-                ]
-            )
-            usage_url_div_style = {"display": "block", "margin-bottom": "10px"}
-            return no_update, usage_url_div_children, usage_url_div_style
+        return no_update
     raise PreventUpdate
+
+
+# Subscan ボタン用のクライアントサイドコールバック
+app.clientside_callback(
+    """
+    function(n_clicks, address, token, stk_type) {
+        if (n_clicks > 0 && address && token && stk_type) {
+            let url;
+            const token_fn = {
+                "DOT": "polkadot",
+                "KSM": "kusama",
+                "ASTR": "astar",
+                "MANTA": "manta"
+            }[token] || "";
+
+            if (stk_type === "Nominator") {
+                url = `https://${token_fn}.subscan.io/reward?address=${address}&role=account`;
+            } else if (stk_type === "NominationPool") {
+                url = `https://${token_fn}.subscan.io/nomination_pool/paidout?address=${address}`;
+            }
+
+            if (url) {
+                window.open(url, "_blank");
+            }
+        }
+        return null;
+    }
+    """,
+    Output("hidden-div-for-subscan-callback", "children"),
+    Input("submit_subscan_account_info", "n_clicks"),
+    State("input_address", "value"),
+    State("drop_down_div", "value"),
+    State("stk_type", "value"),
+    prevent_initial_call=True,
+)
 
 
 # Callback function to Doate Div / children triggered by Doate Button / n_clicks
@@ -574,8 +601,6 @@ def open_url_about_project_info(n_clicks):
     Output("confirm_error_dialog_subscan", "displayed"),
     Output("confirm_error_dialog_subscan", "message"),
     Output("subscan_account_info", "children"),
-    Output("subscan_url_div", "children"),
-    Output("subscan_url_div", "style"),
     Input("submit_subscan_account_info", "n_clicks"),
     State("input_address", "value"),
     State("drop_down_div", "value"),
@@ -586,83 +611,47 @@ def open_url_subscan_info(n_clicks, address, token, stk_type):
     is_error = False
     text = None
     confirm_dialog_flag = False
-    subscan_url_div_style = {"display": "none"}
 
     # Push Subscan Button
     if n_clicks:
-        token_fn = get_token_full_name(token)
         # Check StakingRewards Type Error
         is_error, text = is_stkrwd_type_support_check(token, stk_type)
         if is_error is True:
             confirm_dialog_flag = True
             message = text
             config_manage.is_error = True
-            subscan_url_div_style = {"display": "none"}
             return (
                 confirm_dialog_flag,
                 message,
                 no_update,
-                no_update,
-                subscan_url_div_style,
             )
         elif address == "":
             confirm_dialog_flag = True
             message = "Please input address"
             config_manage.is_error = True
-            subscan_url_div_style = {"display": "none"}
             return (
                 confirm_dialog_flag,
                 message,
                 no_update,
-                no_update,
-                subscan_url_div_style,
             )
-
-        if stk_type == "Nominator":
-            url = f"https://{token_fn}.subscan.io/reward?address={address}&role=account"
-        elif stk_type == "NominationPool":
-            url = f"https://{token_fn}.subscan.io/nomination_pool/paidout?address={address}"
-
-        if not is_docker():
-            webbrowser.open(url)
-            return no_update, no_update, no_update, no_update, {"display": "none"}
-        else:
-            # Display the URL as a link in subscan_url_div
-            subscan_url_div_children = html.Div(
-                [
-                    html.Div(
-                        "Please click the following Subscan URL to open in your browser:",
-                        style={"font-weight": "bold", "margin-left": "5px"},
-                    ),
-                    dcc.Link(
-                        url, href=url, target="_blank", style={"margin-left": "5px"}
-                    ),
-                ]
-            )
-            subscan_url_div_style = {"display": "block", "margin-bottom": "10px"}
-            return (
-                no_update,
-                no_update,
-                no_update,
-                subscan_url_div_children,
-                subscan_url_div_style,
-            )
+        return no_update, no_update, no_update
     raise PreventUpdate
 
 
-def get_token_full_name(token):
-    match token:
-        case "DOT":
-            token_fn = "polkadot"
-        case "KSM":
-            token_fn = "kusama"
-        case "ASTR":
-            token_fn = "astar"
-        case "MANTA":
-            token_fn = "manta"
-        case _:
-            token_fn = ""
-    return token_fn
+# Donate ボタン用のクライアントサイドコールバック
+app.clientside_callback(
+    """
+    function(n_clicks) {
+        if (n_clicks > 0) {
+            window.open("https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash?tab=readme-ov-file#donate", "_blank");
+        }
+        return null;
+    }
+    """,
+    Output("hidden-div-for-donate-callback", "children"),
+    Input("submit_donate_info", "n_clicks"),
+    prevent_initial_call=True,
+)
 
 
 # Callback function to Doate Div / children triggered by Doate Button / n_clicks
@@ -670,31 +659,11 @@ def get_token_full_name(token):
 #  - Pressing the Usage button takes you to README.md on GitHub
 @app.callback(
     Output("donate_info", "children"),
-    Output("donate_url_div", "children"),
-    Output("donate_url_div", "style"),
     Input("submit_donate_info", "n_clicks"),
 )
 def open_url_donate_info(n_clicks):
     if n_clicks:
-        # Open the GitHub README.md
-        url = "https://github.com/7rikazhexde/dlSubscanStakingRewardsHistoryDash?tab=readme-ov-file#donate"
-        if not is_docker():
-            webbrowser.open(url)
-            return no_update, no_update, {"display": "none"}
-        else:
-            donate_url_div_children = html.Div(
-                [
-                    html.Div(
-                        "Please click the following Donate URL to open in your browser:",
-                        style={"font-weight": "bold", "margin-left": "5px"},
-                    ),
-                    dcc.Link(
-                        url, href=url, target="_blank", style={"margin-left": "5px"}
-                    ),
-                ]
-            )
-            donate_url_div_style = {"display": "block", "margin-bottom": "10px"}
-            return no_update, donate_url_div_children, donate_url_div_style
+        return no_update
     raise PreventUpdate
 
 
@@ -1031,38 +1000,29 @@ def is_stkrwd_type_support_check(token, stk_type):
 def is_error_check(response_code, response_status_code, list_num):
     result = False
     text = ""
-    open_url_text1 = ""
-    open_url_text2 = ""
-    if not is_docker():
-        open_url_text1 = "Click OK button to go to the Subscan API Documents page.\n"
-        open_url_text2 = f"Open URL?({config_manage.subscan_api_doc})\n"
-    # Response data error judgment processing
-    # code error (other than success)
+    open_url_text = "Click OK button to go to the Subscan API Documents page.\n"
+    open_url_text += f"Open URL?({config_manage.subscan_api_doc})\n"
+
     if response_code != 0:
         text = (
             f"HTTP Status Codes: {response_code}\n"
             "Error Details: Invalid Account Address.\n"
             "Please Check Account Address.\n\n"
-            f"{open_url_text1}"
-            f"{open_url_text2}"
+            f"{open_url_text}"
         )
         result = True
-    # HTTP Status Codes Error
     elif response_status_code != 200:
         text = (
             f"HTTP Status Codes: {response_status_code}\n"
             "Please Check Subscan API Documents.\n\n"
-            f"{open_url_text1}"
-            f"{open_url_text2}"
+            f"{open_url_text}"
         )
         result = True
-    # Error when no data received
     elif list_num == 0:
         text = (
             "Response data could not be retrieved.\n"
             "Please Check Account Address or Response data.\n\n"
-            f"{open_url_text1}"
-            f"{open_url_text2}"
+            f"{open_url_text}"
         )
         result = True
     return result, text
@@ -1197,7 +1157,5 @@ def display_graph(children, token, history_type, stk_type, sort_type):
 
 if __name__ == "__main__":
     # To allow access from other computers on the local network
-    app.run(debug=False, host="0.0.0.0", port=8050)
-    # To allow access only from your own computer
     # If you want to use the Dash Dev Tools, set dev_tools_ui=True.
-    # app.run(debug=True, dev_tools_ui=False)
+    app.run(debug=False, host="0.0.0.0", port=8050, dev_tools_ui=False)
