@@ -46,7 +46,7 @@ repos:
         verbose: true
         files: ^pyproject\.toml$
       - id: poetry-export
-        args: ["--dev", "-f", "requirements.txt", "-o", "requirements-dev.txt"]
+        args: ["--with", "dev", "-f", "requirements.txt", "-o", "requirements-dev.txt"]
         verbose: true
         files: ^pyproject\.toml$
 

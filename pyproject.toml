@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dlsubscanstakingrewardshistorydash"
-version = "0.2.10"
+version = "0.2.11"
 description = "Web app to retrieve staking reward history using Dash / Plotly and SubscanAPI."
 authors = ["7rikaz_h785 <7rikaz.h785.stat2ltas41lcijad@gmail.com>"]
 license = "MIT"
