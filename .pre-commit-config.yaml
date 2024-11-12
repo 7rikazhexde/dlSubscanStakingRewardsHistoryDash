@@ -3,8 +3,7 @@ fail_fast: true
 # A list of repository mappings
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    # Specify version or tag to use (as of 23.5.31)
-    rev: v4.4.0
+    rev: v5.0.0
     hooks:
       # Remove spaces at end of lines except markdown
       - id: trailing-whitespace
@@ -34,8 +33,7 @@ repos:
 
   # https://python-poetry.org/docs/pre-commit-hooks/#usage
   - repo: https://github.com/python-poetry/poetry
-    # Cannot be executed with local designation (as of 23.11.25)
-    rev: 1.7.1
+    rev: 1.8.0
     hooks:
       - id: poetry-check
         verbose: true
@@ -53,7 +51,7 @@ repos:
   # Reference: https://github.com/DavidAnson/markdownlint-cli2#overview
   # > markdownlint-cli is a traditional command-line interface for markdownlint.
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.36.0
+    rev: v0.42.0
     hooks:
       - id: markdownlint
         args: ["--config", ".markdownlint.jsonc", "README.md"]
@@ -98,10 +96,10 @@ repos:
         types: [python]
 
     # Original script
-    - id: update-pyproject
-      name: Update pyproject.toml version
-      entry: poetry run python ci/update_pyproject_version.py
-      language: system
-      pass_filenames: false
-      stages: [commit]
-      additional_dependencies: []
+    #- id: update-pyproject
+    #  name: Update pyproject.toml version
+    #  entry: poetry run python ci/update_pyproject_version.py
+    #  language: system
+    #  pass_filenames: false
+    #  stages: [commit]
+    #  additional_dependencies: []
